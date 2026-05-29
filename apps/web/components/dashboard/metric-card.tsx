@@ -1,10 +1,11 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer } from "recharts";
+import { Area, AreaChart } from "recharts";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DashboardMetric } from "@/lib/dashboard";
 
 const toneMap = {
@@ -38,29 +39,31 @@ export function MetricCard({ metric }: { metric: DashboardMetric }) {
       </CardHeader>
       <CardContent className="metric-card__content">
         <strong>{metric.value}</strong>
-        <div style={{ height: 36, width: "100%", marginTop: 6 }}>
-          <ResponsiveContainer width="100%" height={36}>
-            <AreaChart data={spark} margin={{ top: 2, right: 2, left: 2, bottom: 0 }}>
-              <defs>
-                <linearGradient id={`spark-${metric.id}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={color} stopOpacity={0.2} />
-                  <stop offset="100%" stopColor={color} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <Area
-                type="monotone"
-                dataKey="v"
-                stroke={color}
-                strokeWidth={1.5}
-                fill={`url(#spark-${metric.id})`}
-                dot={false}
-                isAnimationActive={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <ChartContainer
+          config={{ v: { label: metric.label, color } }}
+          className="metric-sparkline"
+        >
+          <AreaChart data={spark} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id={`spark-${metric.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={color} stopOpacity={0.25} />
+                <stop offset="100%" stopColor={color} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <ChartTooltip content={<ChartTooltipContent hideLabel indicator="dot" />} />
+            <Area
+              type="monotone"
+              dataKey="v"
+              stroke={color}
+              strokeWidth={1.5}
+              fill={`url(#spark-${metric.id})`}
+              dot={false}
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ChartContainer>
         <span>
-          <ArrowUpRight size={16} />
+          <ArrowUpRight size={14} />
           Updated live
         </span>
       </CardContent>

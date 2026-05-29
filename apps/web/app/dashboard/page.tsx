@@ -35,6 +35,7 @@ export default async function DashboardPage() {
           <span>{dashboardInsights.sensorSignal.title}</span>
           <strong>{dashboardInsights.sensorSignal.value}</strong>
           <p>{dashboardInsights.sensorSignal.label}</p>
+          <div className="command-surface__live">Live signal</div>
         </MotionFade>
       </section>
 
