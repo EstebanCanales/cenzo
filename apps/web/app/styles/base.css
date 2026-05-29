@@ -79,7 +79,7 @@ img {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-panel);
-  background: linear-gradient(180deg, #ffffff, #f2f6f1);
+  background: var(--surface);
   box-shadow: var(--shadow);
   padding: 34px;
 }
