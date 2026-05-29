@@ -1,4 +1,3 @@
-import { EvidencePanel } from "@/components/dashboard/evidence-panel";
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { MotionFade } from "@/components/dashboard/motion-fade";
 import { MetricCard } from "@/components/dashboard/metric-card";
@@ -47,14 +46,9 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <section className="overview-lab-grid">
-        <MotionFade delay={0.08}>
-          <EvidencePanel />
-        </MotionFade>
-        <MotionFade delay={0.12}>
-          <StellarContractFlow />
-        </MotionFade>
-      </section>
+      <MotionFade delay={0.08} className="overview-full">
+        <StellarContractFlow />
+      </MotionFade>
     </LabShell>
   );
 }

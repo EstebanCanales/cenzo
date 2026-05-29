@@ -445,6 +445,21 @@
   overflow: hidden;
 }
 
+.stellar-stage__cards--scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.stellar-stage__count--green {
+  background: rgba(26,122,74,0.12);
+  color: var(--green);
+}
+
+.stellar-stage--released {
+  border-right: 0;
+}
+
 .stellar-stage__arrow {
   position: absolute;
   right: -7px;
@@ -500,6 +515,119 @@
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
+}
+
+.stellar-contract-card__time {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 9px;
+  font-family: var(--font-mono);
+}
+
+.stellar-contract-card--released {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.stellar-contract-card--released:hover {
+  filter: brightness(0.96);
+}
+
+/* QR Modal */
+.stellar-qr-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(15, 46, 26, 0.35);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+}
+
+.stellar-qr-modal {
+  position: relative;
+  width: 280px;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.stellar-qr-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.stellar-qr-modal__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--graphite);
+}
+
+.stellar-qr-modal__qr {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.stellar-qr-modal__info {
+  width: 100%;
+  display: grid;
+  gap: 7px;
+}
+
+.stellar-qr-modal__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.stellar-qr-modal__row span {
+  color: var(--muted);
+}
+
+.stellar-qr-modal__row code,
+.stellar-qr-modal__row strong {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.stellar-qr-modal__hint {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 10px;
+  text-align: center;
+}
+
+/* Full-width overview block */
+.overview-full {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
 }
 
 .charts-pair {
@@ -1472,9 +1600,20 @@
   .lab-layout--overview .lab-content {
     flex: 1;
     min-height: 0;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-top: 8px;
+  }
+
+  .lab-layout--overview .overview-full {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .lab-layout--overview .stellar-flow {
+    height: 100%;
+    min-height: 0;
   }
 
   .lab-layout--overview .metric-card {
