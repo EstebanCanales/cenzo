@@ -67,10 +67,12 @@ describe("Soft Connected OS style contract", () => {
   const graphsPage = readFileSync(resolve(root, "app/dashboard/graphs/page.tsx"), "utf8");
   const productGrid = readFileSync(resolve(root, "components/dashboard/product-grid.tsx"), "utf8");
 
-  it("uses rounded connected surfaces instead of small card radii", () => {
-    expect(tokensCss).toContain("--radius-shell: 34px");
-    expect(tokensCss).toContain("--radius-panel: 30px");
+  it("uses sharp card radii (Sharp Light design)", () => {
+    expect(tokensCss).toContain("--radius-shell: 12px");
+    expect(tokensCss).toContain("--radius-panel: 12px");
     expect(tokensCss).toContain("--radius-pill: 999px");
+    expect(tokensCss).toContain('--font-sans: "Inter"');
+    expect(tokensCss).toContain('--font-mono: "IBM Plex Mono"');
   });
 
   it("keeps the document scrollable and avoids locking the app shell to viewport height", () => {
