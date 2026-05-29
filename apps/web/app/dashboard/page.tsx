@@ -16,7 +16,7 @@ export default async function DashboardPage() {
     <LabShell
       description="Visibilidad clara sobre lotes, validaciones y calidad a medida que el producto avanza."
       eyebrow="Overview"
-      heading="Agro Tech Lab"
+      heading={`${greeting}, ${user}.`}
       variant="overview"
     >
       <section className="command-surface">
