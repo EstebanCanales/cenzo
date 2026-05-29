@@ -1,0 +1,10 @@
+.DS_Store
+node_modules
+.next
+dist
+target
+.env
+.env.local
+.env.*.local
+.superpowers/
+.worktrees/
