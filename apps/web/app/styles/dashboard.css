@@ -347,6 +347,161 @@
   gap: 10px;
 }
 
+/* Stellar contract flow */
+.stellar-flow {
+  gap: 12px;
+}
+
+.stellar-workers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.stellar-worker-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 4px 9px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.stellar-worker-node--chain {
+  border-color: rgba(26,122,74,0.3);
+  background: rgba(26,122,74,0.06);
+  color: var(--green);
+}
+
+.stellar-worker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--amber);
+}
+
+.stellar-worker-dot--green {
+  background: var(--green);
+}
+
+.stellar-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.stellar-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 6px;
+  border-right: 1px solid var(--line);
+}
+
+.stellar-stage:last-child {
+  border-right: 0;
+}
+
+.stellar-stage__label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.stellar-stage__count {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--line-strong);
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.stellar-stage__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.stellar-stage__arrow {
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  z-index: 1;
+  background: var(--surface);
+}
+
+.stellar-contract-card {
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 7px 8px;
+  cursor: default;
+}
+
+.stellar-contract-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.stellar-contract-card__hash {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stellar-contract-card__check {
+  flex-shrink: 0;
+}
+
+.stellar-contract-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.stellar-contract-card__meta span {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.stellar-contract-card__meta strong {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .charts-pair {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1343,15 +1498,15 @@
     height: 100%;
     min-height: 0;
     grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
-  }
-
-  .lab-layout--overview .overview-lab-grid__charts {
-    height: 100%;
-    min-height: 0;
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
   }
 
   .lab-layout--overview .evidence-panel {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .lab-layout--overview .stellar-flow {
     height: 100%;
     min-height: 0;
   }

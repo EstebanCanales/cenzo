@@ -2,8 +2,7 @@ import { EvidencePanel } from "@/components/dashboard/evidence-panel";
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { MotionFade } from "@/components/dashboard/motion-fade";
 import { MetricCard } from "@/components/dashboard/metric-card";
-import { TrendChart } from "@/components/dashboard/trend-chart";
-import { VerificationMatrix } from "@/components/dashboard/verification-matrix";
+import { StellarContractFlow } from "@/components/dashboard/stellar-contract-flow";
 import { auth } from "@/auth";
 import { dashboardInsights, dashboardMetrics, getGreetingByDate } from "@/lib/dashboard";
 
@@ -52,14 +51,9 @@ export default async function DashboardPage() {
         <MotionFade delay={0.08}>
           <EvidencePanel />
         </MotionFade>
-        <div className="overview-lab-grid__charts">
-          <MotionFade delay={0.12}>
-            <TrendChart compact />
-          </MotionFade>
-          <MotionFade delay={0.16}>
-            <VerificationMatrix compact />
-          </MotionFade>
-        </div>
+        <MotionFade delay={0.12}>
+          <StellarContractFlow />
+        </MotionFade>
       </section>
     </LabShell>
   );
