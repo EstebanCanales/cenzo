@@ -203,29 +203,27 @@
   align-items: stretch;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--radius-shell);
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
+  border-radius: var(--radius-card);
+  background: var(--surface-soft);
+  box-shadow: none;
 }
 
 .command-surface__greeting {
-  border-left: 0;
-  background:
-    radial-gradient(circle at 8% 0%, rgba(44, 154, 95, 0.12), transparent 30%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(237, 245, 238, 0.82));
-  padding: 22px;
+  background: var(--surface-soft);
+  padding: 16px 20px;
 }
 
 .command-surface__greeting h2 {
-  margin-bottom: 8px;
-  font-size: 28px;
+  margin-bottom: 6px;
+  font-size: 17px;
+  letter-spacing: -0.02em;
 }
 
 .command-surface__greeting p:last-child {
   max-width: 720px;
   margin-bottom: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .command-surface__signal {
@@ -235,17 +233,22 @@
   border-left: 1px solid var(--line);
   background: var(--graphite);
   color: white;
-  padding: 18px;
+  padding: 16px;
 }
 
 .command-surface__signal span,
 .command-surface__signal p {
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .command-surface__signal strong {
-  font-size: 28px;
+  font-size: 24px;
+  font-family: var(--font-mono);
+  color: var(--green);
+  text-shadow: 0 0 20px rgba(26, 122, 74, 0.3);
 }
 
 .metrics-strip {
@@ -254,8 +257,9 @@
   gap: 0;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--radius-panel);
+  border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: none;
 }
 
 .metric-card {
@@ -286,8 +290,10 @@
 }
 
 .metric-card__content strong {
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1;
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
 }
 
 .metric-card__content span {
@@ -325,9 +331,9 @@
   min-height: 390px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--radius-shell);
+  border-radius: var(--radius-card);
   background: var(--surface);
-  box-shadow: var(--shadow-soft);
+  box-shadow: none;
 }
 
 .evidence-panel__media,
@@ -408,10 +414,10 @@
 
 .lab-chart {
   border: 1px solid var(--line);
-  border-radius: var(--radius-panel);
+  border-radius: var(--radius-card);
   background: var(--surface);
-  box-shadow: var(--shadow-soft);
-  padding: 16px;
+  box-shadow: none;
+  padding: 14px 16px;
 }
 
 .lab-chart--wide {
@@ -1418,11 +1424,6 @@
     padding-right: 0;
   }
 
-  .app-frame__toolbar {
-    position: static;
-    padding: 14px 14px 0;
-    margin-bottom: 10px;
-  }
 
   .app-sidebar {
     position: fixed;
