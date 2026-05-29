@@ -1449,10 +1449,10 @@
 
   .lab-layout--overview .lab-main {
     display: flex;
-    min-height: 0;
+    height: calc(100dvh - 28px);
     flex-direction: column;
     overflow: visible;
-    padding: 8px 0 22px;
+    padding: 8px 0 14px;
   }
 
   .lab-layout--overview .lab-header {
