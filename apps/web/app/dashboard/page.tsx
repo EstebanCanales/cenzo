@@ -17,6 +17,7 @@ export default async function DashboardPage() {
       description="Visibilidad clara sobre lotes, validaciones y calidad a medida que el producto avanza."
       eyebrow="Overview"
       heading={`${greeting}, ${user}.`}
+      hideHeader
       variant="overview"
     >
       <section className="command-surface">
