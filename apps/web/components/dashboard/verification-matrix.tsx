@@ -1,11 +1,14 @@
-import { Check, Clock3, TriangleAlert } from "lucide-react";
+"use client";
 
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { verificationMatrix } from "@/lib/dashboard";
 
-const statusIcon = {
-  verified: Check,
-  pending: Clock3,
-  review: TriangleAlert,
+const chartConfig = {
+  verified: { label: "Verified", color: "#1a7a4a" },
+  pending: { label: "Pending", color: "#bbbbbb" },
+  review: { label: "Review", color: "#c98b24" },
 };
 
 type VerificationMatrixProps = {
@@ -13,8 +16,20 @@ type VerificationMatrixProps = {
   detailed?: boolean;
 };
 
-export function VerificationMatrix({ compact = false, detailed = false }: VerificationMatrixProps) {
-  const stages = verificationMatrix.rows[0]?.cells.map((cell) => cell.stage) ?? [];
+export function VerificationMatrix({ compact = false }: VerificationMatrixProps) {
+  const stages = verificationMatrix.rows[0]?.cells.map((c) => c.stage) ?? [];
+
+  const data = stages.map((stage) => {
+    const row: Record<string, string | number> = { stage };
+    for (const crop of verificationMatrix.rows) {
+      const cell = crop.cells.find((c) => c.stage === stage);
+      if (cell) row[crop.label] = cell.count;
+    }
+    return row;
+  });
+
+  const crops = verificationMatrix.rows.map((r) => r.label);
+  const cropColors = ["#1a7a4a", "#c98b24", "#5f8192"];
 
   return (
     <section className={`lab-chart matrix-panel ${compact ? "matrix-panel--compact" : ""}`}>
@@ -25,42 +40,36 @@ export function VerificationMatrix({ compact = false, detailed = false }: Verifi
         </div>
         <span>By crop</span>
       </div>
-      <div className="verification-matrix">
-        {detailed ? (
-          <div className="verification-matrix__stage-row" aria-hidden="true">
-            <span />
-            <div>
-              {stages.map((stage) => (
-                <small key={stage}>{stage}</small>
-              ))}
-            </div>
-          </div>
-        ) : null}
-        {verificationMatrix.rows.map((row) => (
-          <div key={row.label} className="verification-matrix__row">
-            <strong>{row.label}</strong>
-            <div className="verification-matrix__cells">
-              {row.cells.map((cell) => {
-                const Icon = statusIcon[cell.status];
-                return (
-                  <span key={`${row.label}-${cell.stage}`} className={`matrix-cell matrix-cell--${cell.status}`}>
-                    <Icon size={14} />
-                    <strong>{cell.count}</strong>
-                    {detailed ? <small>{cell.stage}</small> : null}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-      {detailed ? (
-        <div className="matrix-panel__legend">
-          <span><Check size={13} /> verified</span>
-          <span><Clock3 size={13} /> pending</span>
-          <span><TriangleAlert size={13} /> review</span>
-        </div>
-      ) : null}
+
+      <ChartContainer
+        config={Object.fromEntries(crops.map((c, i) => [c, { label: c, color: cropColors[i] }]))}
+        className="h-[140px] w-full"
+      >
+        <BarChart data={data} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+          <CartesianGrid vertical={false} stroke="#f0f0f0" />
+          <XAxis
+            dataKey="stage"
+            tick={{ fontSize: 10, fill: "#bbbbbb" }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: "#bbbbbb" }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <Tooltip content={<ChartTooltipContent />} />
+          {crops.map((crop, i) => (
+            <Bar
+              key={crop}
+              dataKey={crop}
+              fill={cropColors[i % cropColors.length]}
+              radius={[3, 3, 0, 0]}
+              maxBarSize={18}
+            />
+          ))}
+        </BarChart>
+      </ChartContainer>
     </section>
   );
 }
