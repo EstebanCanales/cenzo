@@ -1,6 +1,8 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
 import { Area, AreaChart } from "recharts";
 
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +32,8 @@ const toneColor: Record<string, string> = {
 export function MetricCard({ metric }: { metric: DashboardMetric }) {
   const spark = (sparklineData[metric.id] ?? []).map((v) => ({ v }));
   const color = toneColor[metric.tone] ?? "#1a7a4a";
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
     <Card className="metric-card">
@@ -39,29 +43,32 @@ export function MetricCard({ metric }: { metric: DashboardMetric }) {
       </CardHeader>
       <CardContent className="metric-card__content">
         <strong>{metric.value}</strong>
-        <ChartContainer
-          config={{ v: { label: metric.label, color } }}
-          className="metric-sparkline"
-        >
-          <AreaChart data={spark} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id={`spark-${metric.id}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.25} />
-                <stop offset="100%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <ChartTooltip content={<ChartTooltipContent hideLabel indicator="dot" />} />
-            <Area
-              type="monotone"
-              dataKey="v"
-              stroke={color}
-              strokeWidth={1.5}
-              fill={`url(#spark-${metric.id})`}
-              dot={false}
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ChartContainer>
+        <div ref={ref}>
+          <ChartContainer
+            config={{ v: { label: metric.label, color } }}
+            className="metric-sparkline"
+          >
+            <AreaChart key={inView ? 1 : 0} data={spark} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id={`spark-${metric.id}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity={0.25} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <ChartTooltip content={<ChartTooltipContent hideLabel indicator="dot" />} />
+              <Area
+                type="monotone"
+                dataKey="v"
+                stroke={color}
+                strokeWidth={1.5}
+                fill={`url(#spark-${metric.id})`}
+                dot={false}
+                animationDuration={900}
+                animationEasing="ease-out"
+              />
+            </AreaChart>
+          </ChartContainer>
+        </div>
         <span>
           <ArrowUpRight size={14} />
           Updated live

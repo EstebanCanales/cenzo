@@ -1,7 +1,7 @@
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { MotionFade } from "@/components/dashboard/motion-fade";
 import { MetricCard } from "@/components/dashboard/metric-card";
-import { StellarContractFlow } from "@/components/dashboard/stellar-contract-flow";
+import { StellarContractFlowClient } from "@/components/dashboard/stellar-contract-flow-client";
 import { auth } from "@/auth";
 import { dashboardInsights, dashboardMetrics, getGreetingByDate } from "@/lib/dashboard";
 
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
       </div>
 
       <MotionFade delay={0.08} className="overview-full">
-        <StellarContractFlow />
+        <StellarContractFlowClient />
       </MotionFade>
     </LabShell>
   );

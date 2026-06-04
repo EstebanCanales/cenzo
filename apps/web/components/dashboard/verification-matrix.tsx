@@ -1,5 +1,7 @@
 "use client";
 
+import { useInView } from "framer-motion";
+import { useRef } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
@@ -27,6 +29,8 @@ type VerificationMatrixProps = {
 
 export function VerificationMatrix({ compact = false }: VerificationMatrixProps) {
   const stages = verificationMatrix.rows[0]?.cells.map((c) => c.stage) ?? [];
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
   const data = stages.map((stage) => {
     const row: Record<string, string | number> = { stage };
@@ -40,7 +44,7 @@ export function VerificationMatrix({ compact = false }: VerificationMatrixProps)
   const crops = verificationMatrix.rows.map((r) => r.label);
 
   return (
-    <section className={`lab-chart lab-chart--flex matrix-panel ${compact ? "matrix-panel--compact" : ""}`}>
+    <section ref={ref} className={`lab-chart lab-chart--flex matrix-panel ${compact ? "matrix-panel--compact" : ""}`}>
       <div className="lab-chart__header">
         <div>
           <p className="lab-kicker">Matrix</p>
@@ -50,7 +54,7 @@ export function VerificationMatrix({ compact = false }: VerificationMatrixProps)
       </div>
 
       <ChartContainer config={chartConfig} className="flex-1 min-h-0">
-        <BarChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+        <BarChart key={inView ? 1 : 0} data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid vertical={false} stroke="#f0f0f0" />
           <XAxis
             dataKey="stage"
@@ -66,13 +70,16 @@ export function VerificationMatrix({ compact = false }: VerificationMatrixProps)
           />
           <ChartTooltip content={<ChartTooltipContent />} />
           <ChartLegend content={<ChartLegendContent />} />
-          {crops.map((crop) => (
+          {crops.map((crop, i) => (
             <Bar
               key={crop}
               dataKey={crop}
               fill={`var(--color-${crop})`}
               radius={[3, 3, 0, 0]}
               maxBarSize={20}
+              animationDuration={800}
+              animationEasing="ease-out"
+              animationBegin={i * 120}
             />
           ))}
         </BarChart>

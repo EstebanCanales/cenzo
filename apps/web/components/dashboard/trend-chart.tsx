@@ -1,5 +1,7 @@
 "use client";
 
+import { useInView } from "framer-motion";
+import { useRef } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
@@ -26,9 +28,11 @@ export function TrendChart({ compact = false }: TrendChartProps) {
   const totalVerified = points.reduce((s, p) => s + p.verified, 0);
   const totalPending = points.reduce((s, p) => s + p.pending, 0);
   const proofRate = Math.round((totalVerified / (totalVerified + totalPending)) * 100);
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
-    <section className={`lab-chart lab-chart--flex trend-panel ${compact ? "trend-panel--compact" : ""}`}>
+    <section ref={ref} className={`lab-chart lab-chart--flex trend-panel ${compact ? "trend-panel--compact" : ""}`}>
       <div className="lab-chart__header">
         <div>
           <p className="lab-kicker">Velocity</p>
@@ -40,7 +44,7 @@ export function TrendChart({ compact = false }: TrendChartProps) {
       </div>
 
       <ChartContainer config={chartConfig} className="flex-1 min-h-0">
-        <AreaChart data={points} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+        <AreaChart key={inView ? 1 : 0} data={points} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="gradVerified" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="var(--color-verified)" stopOpacity={0.3} />
@@ -75,6 +79,9 @@ export function TrendChart({ compact = false }: TrendChartProps) {
             fill="url(#gradPending)"
             dot={false}
             activeDot={{ r: 3 }}
+            animationDuration={1000}
+            animationEasing="ease-out"
+            animationBegin={0}
           />
           <Area
             type="monotone"
@@ -84,6 +91,9 @@ export function TrendChart({ compact = false }: TrendChartProps) {
             fill="url(#gradVerified)"
             dot={{ r: 3, fill: "var(--color-verified)", strokeWidth: 0 }}
             activeDot={{ r: 4 }}
+            animationDuration={1000}
+            animationEasing="ease-out"
+            animationBegin={150}
           />
         </AreaChart>
       </ChartContainer>
