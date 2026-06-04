@@ -1,0 +1,123 @@
+/* Estilos de la sección Lotes on-chain (Fase 1). */
+
+.censo-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .censo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.censo-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--line, #f0f0f0);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.censo-list {
+  display: grid;
+  gap: 12px;
+}
+
+.censo-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--line, #f0f0f0);
+  border-radius: 12px;
+  background: var(--surface, #fff);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.censo-list__item:hover {
+  border-color: var(--line-strong, #e5e5e5);
+  background: var(--surface-soft, #fafafa);
+}
+
+.censo-mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  color: var(--muted, #888);
+  word-break: break-all;
+}
+
+.censo-link {
+  color: var(--green-strong, #1a7a4a);
+  text-decoration: none;
+  font-size: 12px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.censo-link:hover {
+  text-decoration: underline;
+}
+
+.censo-verif {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.censo-verif--verified {
+  background: var(--green-soft, #edfaf3);
+  color: var(--green-strong, #1a7a4a);
+}
+
+.censo-verif--pending {
+  background: #fff7e6;
+  color: #b7791f;
+}
+
+.censo-verif--tampered {
+  background: #fde8e8;
+  color: #b42318;
+}
+
+.censo-event {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--line, #f0f0f0);
+  border-radius: 12px;
+}
+
+.censo-event__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.censo-payload {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--surface-soft, #fafafa);
+  border-radius: 8px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  overflow-x: auto;
+}
+
+@keyframes censo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: censo-spin 0.9s linear infinite;
+}

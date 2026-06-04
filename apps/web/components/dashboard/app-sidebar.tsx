@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BarChart3, Blocks, Home, Leaf, Menu } from "lucide-react";
+import { BarChart3, Blocks, Home, Leaf, Menu, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: Home },
+  { href: "/dashboard/lotes", label: "Lotes on-chain", icon: ShieldCheck },
   { href: "/dashboard/products", label: "Products", icon: Blocks },
   { href: "/dashboard/graphs", label: "Graphs", icon: BarChart3 },
 ];
