@@ -9,6 +9,7 @@ use axum::{
 use serde_json::{json, Value};
 
 use crate::auth::check_api_key;
+use crate::cert;
 use crate::config::Config;
 use crate::db::{self, ActorRow, Db};
 use crate::error::AppError;
@@ -33,6 +34,7 @@ pub fn router(state: AppState) -> Router {
         .route("/lotes/:id", get(get_lote))
         .route("/lotes/:id/events", post(add_event))
         .route("/lotes/:id/certification", post(set_cert))
+        .route("/lotes/:id/certify", post(certify))
         .route("/public/lotes/:id", get(get_lote))
         .with_state(state)
 }
@@ -232,10 +234,12 @@ async fn set_cert(
     Ok(Json(OkResp { ok: true, tx_hash: tx }))
 }
 
-async fn get_lote(
-    State(st): State<AppState>,
-    Path(id): Path<i64>,
-) -> Result<Json<LoteView>, AppError> {
+/// Ensambla la vista completa de un lote: eventos con su verificación on-chain
+/// + la evaluación de certificación. Compartido por `get_lote` y `certify`.
+async fn assemble_lote(
+    st: &AppState,
+    id: i64,
+) -> Result<(db::LoteRow, Vec<EventView>, bool, Evaluation), AppError> {
     let lote = db::get_lote(&st.db, id)
         .await?
         .ok_or_else(|| AppError::NotFound(format!("lote {id} no existe")))?;
@@ -245,11 +249,13 @@ async fn get_lote(
     let onchain = st.stellar.get_event_hashes(id).await.unwrap_or_default();
 
     let mut events = Vec::with_capacity(rows.len());
+    // (stage, payload, verified) para el motor de evaluación.
+    let mut parsed: Vec<(String, Value, bool)> = Vec::with_capacity(rows.len());
     let mut all_verified = !rows.is_empty();
 
     for row in &rows {
-        let parsed: Value = serde_json::from_str(&row.payload).unwrap_or(Value::Null);
-        let recomputed = sha256_hex(&canonical_json(&parsed));
+        let payload: Value = serde_json::from_str(&row.payload).unwrap_or(Value::Null);
+        let recomputed = sha256_hex(&canonical_json(&payload));
 
         let verification = match onchain.get(row.idx as usize) {
             None => "pending",
@@ -260,11 +266,12 @@ async fn get_lote(
             all_verified = false;
         }
 
+        parsed.push((row.stage.clone(), payload.clone(), verification == "verified"));
         events.push(EventView {
             idx: row.idx,
             stage: row.stage.clone(),
             actor: row.actor.clone(),
-            payload: parsed,
+            payload,
             hash: row.hash.clone(),
             onchain_tx_hash: row.onchain_tx_hash.clone(),
             verification: verification.to_string(),
@@ -272,6 +279,24 @@ async fn get_lote(
         });
     }
 
+    let evals: Vec<cert::EventEval> = parsed
+        .iter()
+        .map(|(stage, payload, verified)| cert::EventEval {
+            stage,
+            payload,
+            verified: *verified,
+        })
+        .collect();
+    let evaluation = cert::evaluate(&evals);
+
+    Ok((lote, events, all_verified, evaluation))
+}
+
+async fn get_lote(
+    State(st): State<AppState>,
+    Path(id): Path<i64>,
+) -> Result<Json<LoteView>, AppError> {
+    let (lote, events, onchain_verified, evaluation) = assemble_lote(&st, id).await?;
     Ok(Json(LoteView {
         id: lote.id,
         producer: lote.producer,
@@ -279,10 +304,29 @@ async fn get_lote(
         tier: lote.tier,
         status: lote.status,
         mint_tx_hash: lote.mint_tx_hash,
-        event_count: rows.len() as i64,
-        onchain_verified: all_verified,
+        event_count: events.len() as i64,
+        onchain_verified,
         events,
+        evaluation,
     }))
+}
+
+/// Certifica automáticamente: computa el tier del rubro y lo escribe on-chain.
+async fn certify(
+    State(st): State<AppState>,
+    Path(id): Path<i64>,
+    headers: HeaderMap,
+) -> Result<Json<CertifyResp>, AppError> {
+    check_api_key(&headers, &st.config.api_shared_secret)?;
+    let (_, _, _, evaluation) = assemble_lote(&st, id).await?;
+    let tier = evaluation.recommended_tier;
+    let code = cert::tier_to_code(&tier);
+
+    let tx = st.stellar.set_certification(id, code).await?;
+    db::update_tier(&st.db, id, &tier).await?;
+    db::insert_certification(&st.db, id, &tier, tx.as_deref()).await?;
+
+    Ok(Json(CertifyResp { tier, tx_hash: tx }))
 }
 
 fn tier_code(tier: &str) -> Option<u8> {

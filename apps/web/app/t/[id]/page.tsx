@@ -1,11 +1,13 @@
 import {
   Award,
+  Check,
   Coffee,
   ExternalLink,
   Leaf,
   ShieldAlert,
   ShieldCheck,
   ShieldQuestion,
+  X,
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -118,6 +120,18 @@ export default async function PublicTracePage({
             Ver emisión en Stellar Explorer <ExternalLink size={11} style={{ display: "inline" }} />
           </a>
         ) : null}
+      </section>
+
+      <section className="pub-card" style={{ display: "grid", gap: 12 }}>
+        <strong style={{ fontSize: 15 }}>Criterios de certificación</strong>
+        <ul className="censo-criteria">
+          {lote.evaluation.criteria.map((c) => (
+            <li key={c.key} className={c.met ? "is-met" : ""}>
+              {c.met ? <Check size={14} /> : <X size={14} />}
+              <span>{c.label}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="pub-trace">

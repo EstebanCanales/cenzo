@@ -84,3 +84,12 @@ export async function setCertification(
   revalidatePath(`/dashboard/lotes/${loteId}`);
   return result;
 }
+
+/** Certifica automáticamente: el backend computa el tier del rubro y lo escribe on-chain. */
+export async function certify(
+  loteId: number,
+): Promise<{ tier: string; tx_hash: string | null }> {
+  const result = await post(`/lotes/${loteId}/certify`, {}, await authHeaders());
+  revalidatePath(`/dashboard/lotes/${loteId}`);
+  return result;
+}

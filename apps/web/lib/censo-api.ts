@@ -14,6 +14,17 @@ export type EventView = {
   created_at: string;
 };
 
+export type Criterion = {
+  key: string;
+  label: string;
+  met: boolean;
+};
+
+export type Evaluation = {
+  recommended_tier: string;
+  criteria: Criterion[];
+};
+
 export type LoteView = {
   id: number;
   producer: string;
@@ -24,6 +35,7 @@ export type LoteView = {
   event_count: number;
   onchain_verified: boolean;
   events: EventView[];
+  evaluation: Evaluation;
 };
 
 export type LoteSummary = {

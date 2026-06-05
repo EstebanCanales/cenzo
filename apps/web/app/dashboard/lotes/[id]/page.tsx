@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ActorOnboarding } from "@/components/dashboard/actor-onboarding";
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { LoteActions } from "@/components/dashboard/lote-actions";
+import { LoteEvaluation } from "@/components/dashboard/lote-evaluation";
 import { LoteQr } from "@/components/dashboard/lote-qr";
 import { Badge } from "@/components/ui/badge";
 import { explorerTx, getLote, ROLE_LABEL, type EventView } from "@/lib/censo-api";
@@ -142,6 +143,11 @@ export default async function LoteDetailPage({
 
         <aside style={{ display: "grid", gap: 16 }}>
           <LoteQr loteId={lote.id} />
+          <LoteEvaluation
+            loteId={lote.id}
+            evaluation={lote.evaluation}
+            currentTier={lote.tier}
+          />
           {actor ? (
             <LoteActions
               loteId={lote.id}

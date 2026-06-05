@@ -83,6 +83,26 @@ pub struct EventView {
     pub created_at: String,
 }
 
+#[derive(Serialize, Clone)]
+pub struct Criterion {
+    pub key: String,
+    pub label: String,
+    pub met: bool,
+}
+
+#[derive(Serialize, Clone)]
+pub struct Evaluation {
+    /// Tier recomendado por el rubro: None | Plata | Oro | Diamante.
+    pub recommended_tier: String,
+    pub criteria: Vec<Criterion>,
+}
+
+#[derive(Serialize)]
+pub struct CertifyResp {
+    pub tier: String,
+    pub tx_hash: Option<String>,
+}
+
 #[derive(Serialize)]
 pub struct LoteView {
     pub id: i64,
@@ -95,4 +115,6 @@ pub struct LoteView {
     /// true si todos los eventos verifican contra el hash on-chain.
     pub onchain_verified: bool,
     pub events: Vec<EventView>,
+    /// Tier recomendado + desglose de criterios (Fase 4).
+    pub evaluation: Evaluation,
 }

@@ -122,6 +122,37 @@
   animation: censo-spin 0.9s linear infinite;
 }
 
+/* ---- Checklist de criterios de certificación ---- */
+
+.censo-criteria {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.censo-criteria li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted, #888);
+}
+
+.censo-criteria li svg {
+  flex-shrink: 0;
+  color: var(--line-strong, #d4d4d4);
+}
+
+.censo-criteria li.is-met {
+  color: var(--text, #111);
+}
+
+.censo-criteria li.is-met svg {
+  color: var(--green-strong, #1a7a4a);
+}
+
 /* ---- Página pública del consumidor (/t/[id]) ---- */
 
 .pub {
