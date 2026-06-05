@@ -9,44 +9,36 @@ import { LoteEvaluation } from "@/components/dashboard/lote-evaluation";
 import { LoteQr } from "@/components/dashboard/lote-qr";
 import { SensorPanel } from "@/components/dashboard/sensor-panel";
 import { Badge } from "@/components/ui/badge";
-import { explorerTx, getClimate, getLote, listSensorReadings, ROLE_LABEL, type EventView } from "@/lib/censo-api";
+import {
+  explorerTx,
+  getClimate,
+  getLote,
+  listSensorReadings,
+  ROLE_LABEL,
+  type EventView,
+} from "@/lib/censo-api";
 import { getCurrentActor } from "@/lib/censo-server";
 
 export const dynamic = "force-dynamic";
 
+const DEMO_LAT = 9.9281;
+const DEMO_LON = -84.0907;
+
 function tierVariant(tier: string): "green" | "gold" | "slate" | "outline" {
   switch (tier) {
-    case "Diamante":
-      return "green";
-    case "Oro":
-      return "gold";
-    case "Plata":
-      return "slate";
-    default:
-      return "outline";
+    case "Diamante": return "green";
+    case "Oro":      return "gold";
+    case "Plata":    return "slate";
+    default:         return "outline";
   }
 }
 
 function VerificationTag({ v }: { v: EventView["verification"] }) {
-  if (v === "verified") {
-    return (
-      <span className="censo-verif censo-verif--verified">
-        <ShieldCheck size={14} /> Verificado
-      </span>
-    );
-  }
-  if (v === "tampered") {
-    return (
-      <span className="censo-verif censo-verif--tampered">
-        <ShieldAlert size={14} /> Manipulado
-      </span>
-    );
-  }
-  return (
-    <span className="censo-verif censo-verif--pending">
-      <ShieldQuestion size={14} /> Pendiente
-    </span>
-  );
+  if (v === "verified")
+    return <span className="censo-verif censo-verif--verified"><ShieldCheck size={13} /> Verificado</span>;
+  if (v === "tampered")
+    return <span className="censo-verif censo-verif--tampered"><ShieldAlert size={13} /> Manipulado</span>;
+  return <span className="censo-verif censo-verif--pending"><ShieldQuestion size={13} /> Pendiente</span>;
 }
 
 function TxLink({ hash, label }: { hash: string | null; label: string }) {
@@ -68,11 +60,12 @@ export default async function LoteDetailPage({
     getLote(id),
     getCurrentActor(),
     listSensorReadings(Number(id)),
-    getClimate(9.9281, -84.0907, 7),  // coordenadas demo Costa Rica central
+    getClimate(DEMO_LAT, DEMO_LON, 7),
   ]);
-  if (!lote) {
-    notFound();
-  }
+
+  if (!lote) notFound();
+
+  const integrityOk = lote.onchain_verified && lote.event_count > 0;
 
   return (
     <LabShell
@@ -81,78 +74,80 @@ export default async function LoteDetailPage({
       description="Trazabilidad anclada en Soroban. Cada evento verifica su hash contra la cadena."
       actions={<Badge variant={tierVariant(lote.tier)}>Certificación: {lote.tier}</Badge>}
     >
-      <div className="censo-grid">
-        <section style={{ display: "grid", gap: 16 }}>
-          <div className="censo-card" style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-              <strong style={{ fontSize: 15 }}>Estado on-chain</strong>
-              {lote.onchain_verified && lote.event_count > 0 ? (
-                <span className="censo-verif censo-verif--verified">
-                  <ShieldCheck size={14} /> Íntegro
-                </span>
+      <div className="lote-detail-layout">
+
+        {/* ── Columna principal ── */}
+        <div className="censo-section">
+
+          {/* Estado on-chain */}
+          <div className="censo-card">
+            <div className="lote-onchain-status">
+              <strong className="censo-section__title">Estado on-chain</strong>
+              {integrityOk ? (
+                <span className="censo-verif censo-verif--verified"><ShieldCheck size={13} /> Íntegro</span>
               ) : lote.event_count === 0 ? (
-                <span className="censo-verif censo-verif--pending">
-                  <ShieldQuestion size={14} /> Sin eventos
-                </span>
+                <span className="censo-verif censo-verif--pending"><ShieldQuestion size={13} /> Sin eventos</span>
               ) : (
-                <span className="censo-verif censo-verif--tampered">
-                  <ShieldAlert size={14} /> Revisar
-                </span>
+                <span className="censo-verif censo-verif--tampered"><ShieldAlert size={13} /> Revisar</span>
               )}
             </div>
-            <div style={{ display: "grid", gap: 6, fontSize: 13 }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "var(--muted)" }}>Eventos anclados</span>
+            <div className="lote-onchain-rows">
+              <div className="lote-onchain-row">
+                <span className="lote-onchain-row__label">Eventos anclados</span>
                 <strong>{lote.event_count}</strong>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "var(--muted)" }}>Mint</span>
+              <div className="lote-onchain-row">
+                <span className="lote-onchain-row__label">Mint</span>
                 <TxLink hash={lote.mint_tx_hash} label="tx" />
               </div>
-              {lote.metadata_uri ? (
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ color: "var(--muted)" }}>Metadata</span>
+              {lote.metadata_uri && (
+                <div className="lote-onchain-row">
+                  <span className="lote-onchain-row__label">Metadata</span>
                   <span className="censo-mono">{lote.metadata_uri}</span>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
 
-          <div style={{ display: "grid", gap: 10 }}>
-            <strong style={{ fontSize: 15 }}>Trazabilidad ({lote.events.length})</strong>
+          {/* Trazabilidad */}
+          <div className="censo-section">
+            <p className="censo-section__title">Trazabilidad ({lote.events.length})</p>
             {lote.events.length === 0 ? (
-              <div className="censo-card" style={{ color: "var(--muted)", fontSize: 13 }}>
-                Todavía no hay eventos. Anclá el primero a la derecha.
+              <div className="censo-card censo-empty">
+                <ShieldQuestion size={24} color="var(--muted)" />
+                <strong>Sin eventos aún</strong>
+                <span style={{ color: "var(--muted)", fontSize: 13 }}>
+                  Añadí el primero desde el panel lateral.
+                </span>
               </div>
             ) : (
-              lote.events.map((ev) => (
-                <article key={ev.idx} className="censo-event">
-                  <div className="censo-event__head">
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span className="censo-mono">#{ev.idx}</span>
-                      <strong>{ev.stage}</strong>
-                      <span style={{ color: "var(--muted)", fontSize: 12 }}>· {ev.actor}</span>
+              <div className="censo-events">
+                {lote.events.map((ev) => (
+                  <article key={ev.idx} className="censo-event">
+                    <div className="censo-event__head">
+                      <div className="censo-event__meta">
+                        <span className="censo-event__idx">#{ev.idx}</span>
+                        <span className="censo-event__stage">{ev.stage}</span>
+                        <span className="censo-event__actor">· {ev.actor}</span>
+                      </div>
+                      <VerificationTag v={ev.verification} />
                     </div>
-                    <VerificationTag v={ev.verification} />
-                  </div>
-                  <pre className="censo-payload">{JSON.stringify(ev.payload, null, 2)}</pre>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                    <span className="censo-mono">sha256: {ev.hash.slice(0, 16)}…</span>
-                    <TxLink hash={ev.onchain_tx_hash} label="tx" />
-                  </div>
-                </article>
-              ))
+                    <pre className="censo-payload">{JSON.stringify(ev.payload, null, 2)}</pre>
+                    <div className="censo-event__footer">
+                      <span className="censo-mono">sha256: {ev.hash.slice(0, 16)}…</span>
+                      <TxLink hash={ev.onchain_tx_hash} label="tx" />
+                    </div>
+                  </article>
+                ))}
+              </div>
             )}
           </div>
-        </section>
+        </div>
 
-        <aside style={{ display: "grid", gap: 16 }}>
+        {/* ── Columna aside ── */}
+        <div className="lote-aside">
           <LoteQr loteId={lote.id} />
-          <LoteEvaluation
-            loteId={lote.id}
-            evaluation={lote.evaluation}
-            currentTier={lote.tier}
-          />
+          <LoteEvaluation loteId={lote.id} evaluation={lote.evaluation} currentTier={lote.tier} />
           {actor ? (
             <LoteActions
               loteId={lote.id}
@@ -163,7 +158,8 @@ export default async function LoteDetailPage({
             <ActorOnboarding />
           )}
           <SensorPanel readings={readings} climate={climate} loteId={lote.id} />
-        </aside>
+        </div>
+
       </div>
     </LabShell>
   );

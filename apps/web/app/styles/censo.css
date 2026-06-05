@@ -1,5 +1,27 @@
-/* Estilos de la sección Lotes on-chain (Fase 1). */
+/* ── Lotes on-chain — layout base ─────────────────────────────── */
 
+.lotes-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.lote-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .lotes-layout,
+  .lote-detail-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* legacy alias */
 .censo-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -13,16 +35,37 @@
   }
 }
 
+/* ── Card base ─────────────────────────────────────────────────── */
+
 .censo-card {
-  background: var(--surface, #fff);
-  border: 1px solid var(--line, #f0f0f0);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 18px;
 }
 
-.censo-list {
+/* ── Sección con título ────────────────────────────────────────── */
+
+.censo-section {
   display: grid;
   gap: 12px;
+}
+
+.censo-section__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Lista de lotes ────────────────────────────────────────────── */
+
+.censo-list {
+  display: grid;
+  gap: 8px;
 }
 
 .censo-list__item {
@@ -30,69 +73,88 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 18px;
-  border: 1px solid var(--line, #f0f0f0);
+  padding: 14px 16px;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--surface, #fff);
+  background: var(--surface);
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.12s ease, background 0.12s ease;
 }
 
 .censo-list__item:hover {
-  border-color: var(--line-strong, #e5e5e5);
-  background: var(--surface-soft, #fafafa);
+  border-color: var(--line-strong);
+  background: var(--surface-soft);
 }
 
-.censo-mono {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 12px;
-  color: var(--muted, #888);
-  word-break: break-all;
+.censo-list__item__info {
+  display: grid;
+  gap: 3px;
 }
 
-.censo-link {
-  color: var(--green-strong, #1a7a4a);
-  text-decoration: none;
-  font-size: 12px;
-  font-family: var(--font-mono, ui-monospace, monospace);
-}
-
-.censo-link:hover {
-  text-decoration: underline;
-}
-
-.censo-verif {
-  display: inline-flex;
+.censo-list__item__head {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 999px;
+  gap: 8px;
 }
 
-.censo-verif--verified {
-  background: var(--green-soft, #edfaf3);
-  color: var(--green-strong, #1a7a4a);
+.censo-list__item__sub {
+  color: var(--muted);
+  font-size: 13px;
 }
 
-.censo-verif--pending {
-  background: #fff7e6;
-  color: #b7791f;
+/* ── Estado on-chain ───────────────────────────────────────────── */
+
+.lote-aside {
+  display: grid;
+  gap: 16px;
 }
 
-.censo-verif--tampered {
-  background: #fde8e8;
-  color: #b42318;
+.lote-onchain-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.lote-onchain-rows {
+  display: grid;
+  gap: 7px;
+}
+
+.lote-onchain-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.lote-onchain-row__label {
+  color: var(--muted);
+}
+
+/* ── Eventos ───────────────────────────────────────────────────── */
+
+.censo-events {
+  display: grid;
+  gap: 10px;
 }
 
 .censo-event {
   display: grid;
   gap: 8px;
   padding: 14px 16px;
-  border: 1px solid var(--line, #f0f0f0);
-  border-radius: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  transition: border-color 0.12s;
+}
+
+.censo-event:hover {
+  border-color: var(--line-strong);
 }
 
 .censo-event__head {
@@ -102,27 +164,105 @@
   gap: 10px;
 }
 
+.censo-event__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.censo-event__idx {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 22px;
+}
+
+.censo-event__stage {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.censo-event__actor {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .censo-payload {
   margin: 0;
   padding: 10px 12px;
-  background: var(--surface-soft, #fafafa);
+  background: var(--surface-soft);
   border-radius: 8px;
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-mono);
   font-size: 12px;
   overflow-x: auto;
+  line-height: 1.6;
 }
 
+.censo-event__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Shared atoms ──────────────────────────────────────────────── */
+
+.censo-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.censo-link {
+  color: var(--green-strong);
+  text-decoration: none;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.censo-link:hover {
+  text-decoration: underline;
+}
+
+.censo-verif {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.censo-verif--verified {
+  background: var(--green-soft);
+  color: var(--green-strong);
+}
+
+.censo-verif--pending {
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+
+.censo-verif--tampered {
+  background: #fde8e8;
+  color: #b42318;
+}
+
+/* ── Animación ─────────────────────────────────────────────────── */
+
 @keyframes censo-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .spin {
   animation: censo-spin 0.9s linear infinite;
 }
 
-/* ---- Checklist de criterios de certificación ---- */
+/* ── Criterios de certificación ────────────────────────────────── */
 
 .censo-criteria {
   list-style: none;
@@ -137,23 +277,55 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: var(--muted, #888);
+  color: var(--muted);
 }
 
 .censo-criteria li svg {
   flex-shrink: 0;
-  color: var(--line-strong, #d4d4d4);
+  color: var(--line-strong);
 }
 
 .censo-criteria li.is-met {
-  color: var(--text, #111);
+  color: var(--text);
 }
 
 .censo-criteria li.is-met svg {
-  color: var(--green-strong, #1a7a4a);
+  color: var(--green-strong);
 }
 
-/* ---- Página pública del consumidor (/t/[id]) ---- */
+/* ── Empty / Error states ──────────────────────────────────────── */
+
+.censo-empty {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.censo-empty strong {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.censo-error {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #fde8e8;
+  border: 1px solid #f4b8b2;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.censo-error code {
+  display: block;
+  margin-top: 6px;
+  opacity: 0.7;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* ── Página pública del consumidor (/t/[id]) ───────────────────── */
 
 .pub {
   max-width: 560px;
@@ -167,19 +339,26 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 14px;
   font-weight: 700;
+  color: var(--text-strong);
+}
+
+.pub-brand span {
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .pub-brand small {
-  color: var(--muted, #888);
-  font-weight: 500;
+  color: var(--muted);
+  font-weight: 400;
   margin-left: auto;
   font-size: 12px;
 }
 
 .pub-card {
-  background: var(--surface, #fff);
-  border: 1px solid var(--line, #f0f0f0);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 24px;
 }
@@ -197,21 +376,23 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--green-soft, #edfaf3);
-  color: var(--green-strong, #1a7a4a);
+  background: var(--green-soft);
+  color: var(--green-strong);
 }
 
 .pub-eyebrow {
   margin: 0;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted, #888);
+  color: var(--muted);
 }
 
 .pub-hero h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .pub-tier {
@@ -221,7 +402,7 @@
   padding: 7px 16px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .pub-tier--diamante {
@@ -243,9 +424,9 @@
 }
 
 .pub-tier--none {
-  background: var(--surface-soft, #fafafa);
-  color: var(--muted, #888);
-  border: 1px solid var(--line, #f0f0f0);
+  background: var(--surface-soft);
+  color: var(--muted);
+  border: 1px solid var(--line);
 }
 
 .pub-integrity {
@@ -259,8 +440,8 @@
 }
 
 .pub-integrity--ok {
-  background: var(--green-soft, #edfaf3);
-  color: var(--green-strong, #1a7a4a);
+  background: var(--green-soft);
+  color: var(--green-strong);
 }
 
 .pub-integrity--warn {
@@ -269,7 +450,8 @@
 }
 
 .pub-trace h2 {
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 700;
   margin: 0 0 14px;
 }
 
@@ -289,11 +471,11 @@
 }
 
 .pub-step__dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--green-strong, #1a7a4a);
-  margin: 5px auto 0;
+  background: var(--green-strong);
+  margin: 6px auto 0;
   position: relative;
   z-index: 1;
 }
@@ -301,12 +483,12 @@
 .pub-step:not(:last-child) .pub-step__dot::after {
   content: "";
   position: absolute;
-  top: 12px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
   width: 2px;
   height: calc(100% + 22px);
-  background: var(--line-strong, #e5e5e5);
+  background: var(--line-strong);
 }
 
 .pub-step__body {
@@ -320,11 +502,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .pub-step__actor {
-  color: var(--muted, #888);
-  font-size: 13px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .pub-step__data {
@@ -336,45 +519,71 @@
 .pub-step__data > div {
   display: flex;
   gap: 8px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .pub-step__data dt {
-  color: var(--muted, #888);
+  color: var(--muted);
   min-width: 90px;
+  flex-shrink: 0;
 }
 
 .pub-step__data dd {
   margin: 0;
   font-weight: 500;
+  word-break: break-all;
 }
 
 .pub-footer {
-  color: var(--muted, #888);
+  color: var(--muted);
   font-size: 12px;
   text-align: center;
-  line-height: 1.5;
-  border-top: 1px solid var(--line, #f0f0f0);
+  line-height: 1.6;
+  border-top: 1px solid var(--line);
   padding-top: 18px;
 }
 
-/* ── Sensores / Clima (Fase 5) ─────────────────────────────────── */
+/* ── Sensores IoT / Clima NASA POWER (Fase 5) ──────────────────── */
 
 .sensor-panel {
   display: grid;
-  gap: 20px;
+  gap: 12px;
 }
 
-.sensor-panel__section {
-  background: var(--card-bg, #fff);
-  border: 1px solid var(--line, #f0f0f0);
+.sensor-section {
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.sensor-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sensor-section__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin: 0;
+}
+
+.sensor-readings {
+  display: grid;
+  gap: 8px;
 }
 
 .sensor-reading-card {
-  background: var(--surface, #f9f9f7);
-  border: 1px solid var(--line, #ebebeb);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px 12px;
   display: grid;
@@ -389,21 +598,21 @@
 }
 
 .sensor-station {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  font-family: var(--font-mono, monospace);
-  color: var(--accent, #1a7a4a);
+  font-family: var(--font-mono);
+  color: var(--green-strong);
 }
 
 .sensor-time {
   font-size: 11px;
-  color: var(--muted, #888);
+  color: var(--muted);
 }
 
 .sensor-reading-card__grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
 }
 
 .sensor-metric {
@@ -411,21 +620,28 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  min-width: 52px;
+  min-width: 48px;
 }
 
 .sensor-metric svg {
-  color: var(--muted, #888);
+  color: var(--muted);
 }
 
 .sensor-metric span {
   font-size: 13px;
   font-weight: 600;
+  color: var(--text-strong);
 }
 
 .sensor-metric small {
   font-size: 10px;
-  color: var(--muted, #888);
+  color: var(--muted);
+}
+
+.sensor-empty {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
 }
 
 .sensor-table {
@@ -438,9 +654,9 @@
   text-align: left;
   font-size: 11px;
   font-weight: 600;
-  color: var(--muted, #888);
+  color: var(--muted);
   padding: 4px 8px 6px;
-  border-bottom: 1px solid var(--line, #ebebeb);
+  border-bottom: 1px solid var(--line);
 }
 
 .sensor-th--num,
@@ -450,12 +666,19 @@
 
 .sensor-td {
   padding: 5px 8px;
-  border-bottom: 1px solid var(--line, #f5f5f5);
-  color: var(--text, #111);
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
 }
 
 .sensor-td:first-child {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+
+.sensor-nasa-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
 }
 
 .btn-sensor-sim {
@@ -466,19 +689,20 @@
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 6px;
-  border: 1px solid var(--accent, #1a7a4a);
-  color: var(--accent, #1a7a4a);
+  border: 1px solid var(--green-strong);
+  color: var(--green-strong);
   background: transparent;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
 }
 
 .btn-sensor-sim:hover:not(:disabled) {
-  background: var(--accent, #1a7a4a);
+  background: var(--green-strong);
   color: #fff;
 }
 
 .btn-sensor-sim:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: default;
 }

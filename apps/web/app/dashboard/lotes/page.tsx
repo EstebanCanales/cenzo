@@ -12,14 +12,10 @@ export const dynamic = "force-dynamic";
 
 function tierVariant(tier: string): "green" | "gold" | "slate" | "outline" {
   switch (tier) {
-    case "Diamante":
-      return "green";
-    case "Oro":
-      return "gold";
-    case "Plata":
-      return "slate";
-    default:
-      return "outline";
+    case "Diamante": return "green";
+    case "Oro":      return "gold";
+    case "Plata":    return "slate";
+    default:         return "outline";
   }
 }
 
@@ -37,65 +33,70 @@ export default async function LotesPage() {
     <LabShell
       eyebrow="On-chain"
       heading="Lotes en Stellar"
-      description="Cada lote es un NFT en Soroban (testnet) que acumula su trazabilidad y su certificación. Mintea, ancla eventos y verifica de forma inmutable."
+      description="Cada lote es un NFT en Soroban (testnet) con trazabilidad y certificación inmutables."
       actions={
         actor ? <Badge variant="green">Actuando como {ROLE_LABEL[actor.kind]}</Badge> : null
       }
     >
-      <div className="censo-grid">
-        <section className="censo-list">
+      <div className="lotes-layout">
+
+        {/* ── Lista ── */}
+        <section className="censo-section">
           {error ? (
-            <div className="censo-card" style={{ color: "#b42318" }}>
+            <div className="censo-error">
               Backend no disponible: {error}
-              <br />
-              <span style={{ color: "var(--muted)", fontSize: 13 }}>
-                Arrancá la API con <code>npm run dev:api</code>.
-              </span>
+              <code>Arrancá la API con npm run dev:api</code>
             </div>
           ) : lotes.length === 0 ? (
-            <div className="censo-card" style={{ display: "grid", gap: 8, placeItems: "center", padding: 40 }}>
+            <div className="censo-card censo-empty">
               <PackageSearch size={28} color="var(--muted)" />
               <strong>Aún no hay lotes</strong>
               <span style={{ color: "var(--muted)", fontSize: 13 }}>
-                Mintea el primero con el formulario de la derecha.
+                {actor && canMint(actor.kind)
+                  ? "Mintea el primero con el formulario de la derecha."
+                  : "Un agricultor puede mintear el primer lote."}
               </span>
             </div>
           ) : (
-            lotes.map((lote) => (
-              <Link
-                key={lote.id}
-                href={`/dashboard/lotes/${lote.id}`}
-                className="censo-list__item"
-              >
-                <div style={{ display: "grid", gap: 4 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <ShieldCheck size={16} color="var(--green-strong, #1a7a4a)" />
-                    <strong>Lote #{lote.id}</strong>
-                    <Badge variant={tierVariant(lote.tier)}>{lote.tier}</Badge>
+            <div className="censo-list">
+              {lotes.map((lote) => (
+                <Link
+                  key={lote.id}
+                  href={`/dashboard/lotes/${lote.id}`}
+                  className="censo-list__item"
+                >
+                  <div className="censo-list__item__info">
+                    <div className="censo-list__item__head">
+                      <ShieldCheck size={16} color="var(--green-strong)" />
+                      <strong>Lote #{lote.id}</strong>
+                      <Badge variant={tierVariant(lote.tier)}>{lote.tier}</Badge>
+                    </div>
+                    <span className="censo-list__item__sub">{lote.producer}</span>
                   </div>
-                  <span style={{ color: "var(--muted)", fontSize: 13 }}>{lote.producer}</span>
-                </div>
-                <ChevronRight size={18} color="var(--muted)" />
-              </Link>
-            ))
+                  <ChevronRight size={18} color="var(--muted)" />
+                </Link>
+              ))}
+            </div>
           )}
         </section>
 
+        {/* ── Aside: crear / info de rol ── */}
         <aside>
           {!actor ? (
             <ActorOnboarding />
           ) : canMint(actor.kind) ? (
             <LoteCreateForm />
           ) : (
-            <div className="censo-card" style={{ display: "grid", gap: 6 }}>
-              <strong style={{ fontSize: 15 }}>Rol {ROLE_LABEL[actor.kind]}</strong>
-              <span style={{ color: "var(--muted)", fontSize: 13 }}>
-                Tu rol no origina lotes. Abrí un lote existente para registrar tus etapas
-                ({actor.allowed_stages.join(", ")}).
-              </span>
+            <div className="censo-card censo-section">
+              <p className="censo-section__title">Rol {ROLE_LABEL[actor.kind]}</p>
+              <p style={{ color: "var(--muted)", fontSize: 13, margin: 0 }}>
+                Tu rol no origina lotes. Abrí uno existente para registrar tus etapas:
+                {" "}<strong>{actor.allowed_stages.join(", ")}</strong>.
+              </p>
             </div>
           )}
         </aside>
+
       </div>
     </LabShell>
   );

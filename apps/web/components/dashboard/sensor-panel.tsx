@@ -27,7 +27,7 @@ function ReadingCard({ r }: { r: SensorReading }) {
           <small>Humedad</small>
         </div>
         <div className="sensor-metric">
-          <Thermometer size={13} className="text-amber-600" />
+          <Thermometer size={13} />
           <span>{fmt(r.temp_suelo)} °C</span>
           <small>Suelo</small>
         </div>
@@ -39,7 +39,7 @@ function ReadingCard({ r }: { r: SensorReading }) {
         <div className="sensor-metric">
           <CloudRain size={13} />
           <span>{fmt(r.lluvia_mm, 0)} mm</span>
-          <small>Lluvia 24h</small>
+          <small>Lluvia</small>
         </div>
       </div>
     </div>
@@ -66,26 +66,23 @@ type Props = {
 };
 
 export function SensorPanel({ readings, climate, loteId }: Props) {
+  const stationId = loteId ? `finca-${String(loteId).padStart(2, "0")}` : "finca-demo";
+
   return (
     <div className="sensor-panel">
-      <div className="sensor-panel__section">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <strong style={{ fontSize: 14 }}>
-            <Wind size={14} style={{ display: "inline", marginRight: 6 }} />
+      <div className="sensor-section">
+        <div className="sensor-section__header">
+          <p className="sensor-section__title">
+            <Wind size={14} />
             Sensores IoT
-          </strong>
-          <SensorSimulateButton
-            stationId={loteId ? `finca-${String(loteId).padStart(2, "0")}` : "finca-demo"}
-            loteId={loteId}
-          />
+          </p>
+          <SensorSimulateButton stationId={stationId} loteId={loteId} />
         </div>
 
         {readings.length === 0 ? (
-          <p style={{ color: "var(--muted)", fontSize: 13, margin: "8px 0 0" }}>
-            Sin lecturas. Simulá la primera con el botón.
-          </p>
+          <p className="sensor-empty">Sin lecturas. Simulá la primera con el botón.</p>
         ) : (
-          <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+          <div className="sensor-readings">
             {readings.slice(0, 3).map((r) => (
               <ReadingCard key={r.id} r={r} />
             ))}
@@ -94,13 +91,15 @@ export function SensorPanel({ readings, climate, loteId }: Props) {
       </div>
 
       {climate && climate.days.length > 0 && (
-        <div className="sensor-panel__section">
-          <strong style={{ fontSize: 14 }}>
-            <CloudRain size={14} style={{ display: "inline", marginRight: 6 }} />
-            Clima NASA POWER — últimos {climate.days.length} días
-          </strong>
-          <p style={{ color: "var(--muted)", fontSize: 11, margin: "2px 0 8px" }}>
-            Lat {climate.lat.toFixed(2)}, Lon {climate.lon.toFixed(2)} · datos satelitales reales
+        <div className="sensor-section">
+          <div className="sensor-section__header">
+            <p className="sensor-section__title">
+              <CloudRain size={14} />
+              Clima satelital · NASA POWER
+            </p>
+          </div>
+          <p className="sensor-nasa-note">
+            Lat {climate.lat.toFixed(2)}, Lon {climate.lon.toFixed(2)} · {climate.days.length} días reales
           </p>
           <div style={{ overflowX: "auto" }}>
             <table className="sensor-table">
@@ -110,7 +109,7 @@ export function SensorPanel({ readings, climate, loteId }: Props) {
                   <th className="sensor-th sensor-th--num">Tmáx</th>
                   <th className="sensor-th sensor-th--num">Tmín</th>
                   <th className="sensor-th sensor-th--num">HR%</th>
-                  <th className="sensor-th sensor-th--num">Lluvia mm</th>
+                  <th className="sensor-th sensor-th--num">mm</th>
                 </tr>
               </thead>
               <tbody>
@@ -124,9 +123,7 @@ export function SensorPanel({ readings, climate, loteId }: Props) {
       )}
 
       {!climate && (
-        <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 8 }}>
-          Clima satelital no disponible (coordenadas no configuradas).
-        </p>
+        <p className="sensor-nasa-note">Clima satelital no disponible.</p>
       )}
     </div>
   );
