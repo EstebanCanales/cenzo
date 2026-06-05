@@ -1,7 +1,5 @@
 "use client";
 
-import { useInView } from "framer-motion";
-import { useRef } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
@@ -10,28 +8,25 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
+  type ChartConfig,
 } from "@/components/ui/chart";
 import { verificationMatrix } from "@/lib/dashboard";
 
-const cropColors = ["#1a7a4a", "#c98b24", "#5f8192"] as const;
+const GRADIENTS = [
+  { id: "gCoffee",  from: "hsl(161 80% 52%)", to: "hsl(161 80% 36%)" },
+  { id: "gCacao",   from: "hsl(270 70% 70%)", to: "hsl(270 70% 50%)" },
+  { id: "gBanano",  from: "hsl(217 90% 70%)", to: "hsl(217 90% 50%)" },
+] as const;
 
 const chartConfig = Object.fromEntries(
   verificationMatrix.rows.map((row, i) => [
     row.label,
-    { label: row.label, color: cropColors[i % cropColors.length] },
+    { label: row.label, color: GRADIENTS[i % GRADIENTS.length].from },
   ])
-);
+) satisfies ChartConfig;
 
-type VerificationMatrixProps = {
-  compact?: boolean;
-  detailed?: boolean;
-};
-
-export function VerificationMatrix({ compact = false, detailed = false }: VerificationMatrixProps) {
+export function VerificationMatrix({ detailed = false }: { detailed?: boolean }) {
   const stages = verificationMatrix.rows[0]?.cells.map((c) => c.stage) ?? [];
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-
   const data = stages.map((stage) => {
     const row: Record<string, string | number> = { stage };
     for (const crop of verificationMatrix.rows) {
@@ -41,52 +36,42 @@ export function VerificationMatrix({ compact = false, detailed = false }: Verifi
     return row;
   });
 
-  const crops = verificationMatrix.rows.map((r) => r.label);
-
   return (
-    <section ref={ref} className={`lab-chart lab-chart--flex matrix-panel ${compact ? "matrix-panel--compact" : ""}`}>
-      <div className="lab-chart__header matrix-panel__header">
+    <div className="rounded-xl border border-[var(--line)] bg-white p-5 flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="lab-kicker">Matrix</p>
-          <h2>Stage verification</h2>
-          {detailed ? (
-            <p className="lab-chart__lede">Cross-check crop readiness against each operational stage.</p>
-          ) : null}
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--muted)]">Matrix</p>
+          <h3 className="text-base font-bold text-[var(--text-strong)] mt-0.5">Stage verification</h3>
+          {detailed && (
+            <p className="text-xs text-[var(--muted)] mt-1">Cross-check crop readiness against each operational stage.</p>
+          )}
         </div>
-        <span>By crop</span>
+        <span className="text-xs text-[var(--muted)]">By crop</span>
       </div>
 
-      <ChartContainer config={chartConfig} className="flex-1 min-h-0">
-        <BarChart key={inView ? 1 : 0} data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-          <CartesianGrid vertical={false} stroke="#f0f0f0" />
-          <XAxis
-            dataKey="stage"
-            tick={{ fontSize: 10, fill: "#bbbbbb" }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            tick={{ fontSize: 10, fill: "#bbbbbb" }}
-            axisLine={false}
-            tickLine={false}
-            width={32}
-          />
+      <ChartContainer config={chartConfig} className="h-[200px] w-full">
+        <BarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+          <defs>
+            {GRADIENTS.map((g) => (
+              <linearGradient key={g.id} id={g.id} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor={g.from} stopOpacity={1} />
+                <stop offset="100%" stopColor={g.to}   stopOpacity={0.7} />
+              </linearGradient>
+            ))}
+          </defs>
+          <CartesianGrid vertical={false} stroke="hsl(220 14% 96%)" />
+          <XAxis dataKey="stage" tick={{ fontSize: 11, fill: "hsl(220 14% 62%)" }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: "hsl(220 14% 62%)" }} axisLine={false} tickLine={false} width={28} />
           <ChartTooltip content={<ChartTooltipContent />} />
           <ChartLegend content={<ChartLegendContent />} />
-          {crops.map((crop, i) => (
-            <Bar
-              key={crop}
-              dataKey={crop}
-              fill={`var(--color-${crop})`}
-              radius={[3, 3, 0, 0]}
-              maxBarSize={20}
-              animationDuration={800}
-              animationEasing="ease-out"
-              animationBegin={i * 120}
-            />
+          {verificationMatrix.rows.map((crop, i) => (
+            <Bar key={crop.label} dataKey={crop.label}
+              fill={`url(#${GRADIENTS[i % GRADIENTS.length].id})`}
+              radius={[4, 4, 0, 0]} maxBarSize={20}
+              animationDuration={700} animationBegin={i * 100} />
           ))}
         </BarChart>
       </ChartContainer>
-    </section>
+    </div>
   );
 }

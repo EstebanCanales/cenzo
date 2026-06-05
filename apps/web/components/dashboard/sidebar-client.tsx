@@ -1,9 +1,9 @@
 "use client";
 
-import { BarChart3, Blocks, ChevronDown, Home, Leaf, LogOut, Menu, ShieldCheck, X } from "lucide-react";
+import { BarChart3, Blocks, ChevronDown, Home, Leaf, LogOut, Menu, ShieldCheck, Wallet, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useTransition, useState } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -25,12 +25,31 @@ type SidebarClientProps = {
   name: string;
   email: string;
   initials: string;
+  walletAddress?: string | null;
   onSignOut: () => Promise<void>;
 };
 
-export function SidebarClient({ name, email, initials, onSignOut }: SidebarClientProps) {
+export function SidebarClient({ name, email, initials, walletAddress, onSignOut }: SidebarClientProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  function handleSignOut() {
+    startTransition(async () => {
+      // Borra la wallet cookie si existe
+      await fetch("/api/wallet/session", { method: "DELETE" });
+      await onSignOut();
+      router.push("/");
+      router.refresh();
+    });
+  }
+
+  const isWallet = Boolean(walletAddress);
+  const displayName = isWallet
+    ? `${walletAddress!.slice(0, 6)}…${walletAddress!.slice(-4)}`
+    : name;
+  const displayEmail = isWallet ? "Freighter wallet" : email;
 
   return (
     <>
@@ -46,10 +65,7 @@ export function SidebarClient({ name, email, initials, onSignOut }: SidebarClien
 
       {/* Backdrop mobile */}
       {open && (
-        <div
-          className="md:hidden fixed inset-0 z-40 bg-black/20"
-          onClick={() => setOpen(false)}
-        />
+        <div className="md:hidden fixed inset-0 z-40 bg-black/20" onClick={() => setOpen(false)} />
       )}
 
       {/* Sidebar rail */}
@@ -96,9 +112,7 @@ export function SidebarClient({ name, email, initials, onSignOut }: SidebarClien
               >
                 <Icon size={14} />
                 <span>{item.label}</span>
-                {active && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--green)]" />
-                )}
+                {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--green)]" />}
               </Link>
             );
           })}
@@ -106,15 +120,23 @@ export function SidebarClient({ name, email, initials, onSignOut }: SidebarClien
 
         {/* Bottom */}
         <div className="flex flex-col gap-2 p-3 pt-0">
+          {/* Stellar badge */}
           <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] px-3 py-2.5">
             <span className="block text-[9px] font-bold tracking-widest uppercase text-[var(--muted)] mb-1">
-              Stellar
+              Stellar · Soroban
             </span>
-            <p className="text-[10px] text-[var(--muted)] leading-relaxed m-0">
-              Verifica evidencia y reduce manipulación en la cadena agrícola.
-            </p>
+            {isWallet ? (
+              <p className="text-[10px] font-mono text-[var(--green)] leading-relaxed m-0 truncate">
+                {walletAddress}
+              </p>
+            ) : (
+              <p className="text-[10px] text-[var(--muted)] leading-relaxed m-0">
+                Verifica evidencia y reduce manipulación en la cadena agrícola.
+              </p>
+            )}
           </div>
 
+          {/* Account dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -122,24 +144,26 @@ export function SidebarClient({ name, email, initials, onSignOut }: SidebarClien
                 className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg border-t border-[var(--line)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
               >
                 <Avatar className="h-7 w-7 shrink-0">
-                  <AvatarFallback className="text-[11px]">{initials}</AvatarFallback>
+                  <AvatarFallback className="text-[11px]">
+                    {isWallet ? <Wallet size={13} /> : initials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0 text-left">
-                  <strong className="block text-[11px] font-semibold truncate">{name}</strong>
-                  <span className="block text-[10px] text-[var(--muted)] truncate">{email}</span>
+                  <strong className="block text-[11px] font-semibold truncate">{displayName}</strong>
+                  <span className="block text-[10px] text-[var(--muted)] truncate">{displayEmail}</span>
                 </div>
                 <ChevronDown size={13} className="text-[var(--muted)] shrink-0" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="top">
-              <form action={onSignOut}>
-                <DropdownMenuItem asChild>
-                  <button className="dropdown-action-button" type="submit">
-                    <LogOut size={14} />
-                    Cerrar sesión
-                  </button>
-                </DropdownMenuItem>
-              </form>
+            <DropdownMenuContent align="end" side="top" className="w-48">
+              <DropdownMenuItem
+                className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+                disabled={pending}
+                onSelect={handleSignOut}
+              >
+                <LogOut size={14} className="mr-2" />
+                {pending ? "Cerrando…" : "Cerrar sesión"}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

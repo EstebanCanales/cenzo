@@ -160,3 +160,41 @@ export async function getClimate(lat: number, lon: number, days = 7): Promise<Cl
     return null;
   }
 }
+
+// ── NFT Score ─────────────────────────────────────────────────────────────
+
+export type NftScoreComponent = {
+  score: number;
+  max: number;
+  label: string;
+  detail: string;
+};
+
+export type NftScoreData = {
+  lote_id: number;
+  producer: string;
+  tier: string;
+  score: {
+    total: number;
+    grade: string;
+    grade_label: string;
+    summary: string;
+    breakdown: {
+      trazabilidad:   NftScoreComponent;
+      integridad:     NftScoreComponent;
+      sensores:       NftScoreComponent;
+      certificacion:  NftScoreComponent;
+    };
+    traits: { trait_type: string; value: string; display_type?: string }[];
+  };
+};
+
+export async function getNftScore(loteId: number | string): Promise<NftScoreData | null> {
+  try {
+    const res = await fetch(`${CENSO_API_URL}/lotes/${loteId}/nft-score`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}

@@ -5,6 +5,7 @@ mod db;
 mod error;
 mod hashing;
 mod models;
+mod nft_score;
 mod roles;
 mod routes;
 mod sensors;

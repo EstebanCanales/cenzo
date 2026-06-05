@@ -43,8 +43,12 @@ function randHash() {
   return "G" + Math.random().toString(36).slice(2, 8).toUpperCase() + "…" + Math.random().toString(36).slice(2, 5).toUpperCase();
 }
 
-function makeContract(id: string): Contract {
-  return { id, hash: randHash(), crop: CROPS[Math.floor(Math.random() * CROPS.length)], amount: AMOUNTS[Math.floor(Math.random() * AMOUNTS.length)], stage: "queued", age: 0 };
+function nextId() {
+  return `gen-${++_counter}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function makeContract(id?: string): Contract {
+  return { id: id ?? nextId(), hash: randHash(), crop: CROPS[Math.floor(Math.random() * CROPS.length)], amount: AMOUNTS[Math.floor(Math.random() * AMOUNTS.length)], stage: "queued", age: 0 };
 }
 
 function now() {
@@ -64,10 +68,10 @@ const STAGE_ICONS: Record<Stage, React.ComponentType<React.SVGProps<SVGSVGElemen
   queued: Clock, worker: Cpu, verified: ShieldCheck, released: CheckCircle2,
 };
 
-let _counter = 100;
+let _counter = 0;
 
 const INIT_RELEASED = Array.from({ length: 3 }, (_, i) => ({
-  ...makeContract(String(++_counter)),
+  ...makeContract(),
   stage: "released" as Stage,
   age: 0,
   releasedAt: `${12 - i * 3}:0${i}`,
@@ -92,7 +96,7 @@ type Props = { lotes?: LoteSummary[] };
 export function StellarContractFlow({ lotes = [] }: Props) {
   const [pipeline, setPipeline] = useState<Contract[]>(() =>
     Array.from({ length: 4 }, (_, i) => ({
-      ...makeContract(String(++_counter)),
+      ...makeContract(),
       stage: (["queued", "worker", "verified"] as Stage[])[i % 3],
       age: i * 2,
     }))
@@ -130,11 +134,11 @@ export function StellarContractFlow({ lotes = [] }: Props) {
           if (cur < 2) {
             next[advanceIdx] = { ...next[advanceIdx], stage: stages[cur + 1], age: 0 };
           } else if (cur === 2) {
-            const promoted: Contract = { ...next[advanceIdx], stage: "released", age: 0, releasedAt: now() };
-            setReleased((r) => [promoted, ...r.slice(0, 19)]);
+            const promoted: Contract = { ...next[advanceIdx], id: nextId(), stage: "released", age: 0, releasedAt: now() };
+            setReleased((r) => r.some(c => c.id === promoted.id) ? r : [promoted, ...r.slice(0, 19)]);
             setTotalReleased((n) => n + 1);
             setSelected(promoted);
-            next[advanceIdx] = makeContract(String(++_counter));
+            next[advanceIdx] = makeContract();
           }
         }
         return next;
@@ -284,7 +288,7 @@ export function StellarContractFlow({ lotes = [] }: Props) {
                     ? `https://censo.app/t/${selected.loteId}`
                     : `stellar:contract:${selected.hash}:${selected.crop}:${selected.amount}`
                   }
-                  size={148}
+                  size={180}
                   fgColor="#0f2e1a"
                   bgColor="transparent"
                 />

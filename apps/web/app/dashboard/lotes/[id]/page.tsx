@@ -7,12 +7,14 @@ import { LabShell } from "@/components/dashboard/lab-shell";
 import { LoteActions } from "@/components/dashboard/lote-actions";
 import { LoteEvaluation } from "@/components/dashboard/lote-evaluation";
 import { LoteQr } from "@/components/dashboard/lote-qr";
+import { NftScoreCard } from "@/components/dashboard/nft-score-card";
 import { SensorPanel } from "@/components/dashboard/sensor-panel";
 import { Badge } from "@/components/ui/badge";
 import {
   explorerTx,
   getClimate,
   getLote,
+  getNftScore,
   listSensorReadings,
   ROLE_LABEL,
   type EventView,
@@ -56,11 +58,12 @@ export default async function LoteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [lote, actor, readings, climate] = await Promise.all([
+  const [lote, actor, readings, climate, nftScore] = await Promise.all([
     getLote(id),
     getCurrentActor(),
     listSensorReadings(Number(id)),
     getClimate(DEMO_LAT, DEMO_LON, 7),
+    getNftScore(Number(id)).catch(() => null),
   ]);
 
   if (!lote) notFound();
@@ -158,6 +161,7 @@ export default async function LoteDetailPage({
             <ActorOnboarding />
           )}
           <SensorPanel readings={readings} climate={climate} loteId={lote.id} />
+          {nftScore && <NftScoreCard data={nftScore} loteId={lote.id} />}
         </div>
 
       </div>

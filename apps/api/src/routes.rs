@@ -16,6 +16,7 @@ use crate::db::{self, ActorRow, Db};
 use crate::error::AppError;
 use crate::hashing::{canonical_json, sha256_hex};
 use crate::models::*;
+use crate::nft_score::{self, EventSnap, ScoreInput};
 use crate::roles;
 use crate::sensors;
 use crate::stellar::Stellar;
@@ -42,6 +43,8 @@ pub fn router(state: AppState) -> Router {
         .route("/sensors/readings", get(list_readings).post(add_reading))
         .route("/sensors/simulate", post(simulate_reading))
         .route("/sensors/climate/:lat/:lon", get(get_climate))
+        // NFT score
+        .route("/lotes/:id/nft-score", get(get_nft_score))
         .with_state(state)
 }
 
@@ -426,4 +429,48 @@ async fn get_climate(
     let days = q.days.unwrap_or(7).min(30);
     let climate = sensors::fetch_nasa_climate(lat, lon, days).await?;
     Ok(Json(serde_json::to_value(climate).unwrap()))
+}
+
+// ── NFT Score ─────────────────────────────────────────────────────────────
+
+async fn get_nft_score(
+    State(state): State<AppState>,
+    Path(id): Path<i64>,
+) -> Result<Json<Value>, AppError> {
+    let lote = db::get_lote(&state.db, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound(format!("lote {id} no existe")))?;
+
+    let event_rows = db::get_events(&state.db, id).await?;
+    let readings   = db::list_sensor_readings(&state.db, Some(id), 10).await?;
+
+    // Obtener hashes on-chain para verificación
+    let onchain_hashes = state.stellar.get_event_hashes(id).await.unwrap_or_default();
+
+    let events: Vec<EventSnap> = event_rows
+        .iter()
+        .enumerate()
+        .map(|(i, e)| {
+            let onchain = onchain_hashes.get(i).map(|s| s.as_str()).unwrap_or("");
+            EventSnap {
+                stage:    e.stage.clone(),
+                verified: !onchain.is_empty() && onchain == e.hash,
+            }
+        })
+        .collect();
+
+    let input = ScoreInput {
+        tier:     &lote.tier,
+        events:   &events,
+        readings: &readings,
+    };
+
+    let score = nft_score::compute(&input);
+
+    Ok(Json(serde_json::json!({
+        "lote_id":  id,
+        "producer": lote.producer,
+        "tier":     lote.tier,
+        "score":    score,
+    })))
 }
