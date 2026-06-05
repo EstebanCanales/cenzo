@@ -75,10 +75,11 @@ El NFT del lote lleva la imagen del certificado generada dinámicamente — úni
 | Documento | Contenido |
 |-----------|-----------|
 | [TECHNICAL.md](docs/TECHNICAL.md) | Arquitectura, stack completo y estructura del repo |
+| [WEB3.md](docs/WEB3.md) | Stellar, Soroban, Freighter, hash-anchor y NFT score |
 | [API.md](docs/API.md) | Referencia completa de la API REST con ejemplos |
 | [CONTRACT.md](docs/CONTRACT.md) | Contrato Soroban: funciones, flujo de verificación y tests |
 | [DATABASE.md](docs/DATABASE.md) | Esquema SQLite, tablas y migraciones |
-| [SETUP.md](docs/SETUP.md) | Setup local, despliegue y variables de entorno |
+| [SETUP.md](docs/SETUP.md) | Setup local y deploy en Railway paso a paso |
 
 ---
 
