@@ -12,8 +12,7 @@
 <br/>
 
 [![Stellar](https://img.shields.io/badge/Stellar-Soroban-7C3AED?logo=stellar&logoColor=white&style=for-the-badge)](https://stellar.org)
-[![Live Demo](https://img.shields.io/badge/Demo-techrebel.world-22c55e?style=for-the-badge)](https://www.techrebel.world/product/cenzo/dashboard)
-[![Morpho Studio](https://img.shields.io/badge/Morpho_Studio-Competencia-F59E0B?style=for-the-badge)](https://www.techrebel.world/product/cenzo/dashboard)
+[![Morpho Studio](https://img.shields.io/badge/Morpho_Studio-Competencia-F59E0B?style=for-the-badge)](https://www.techrebel.world)
 
 </div>
 
@@ -76,10 +75,6 @@ El NFT del lote lleva la imagen del certificado generada dinámicamente — úni
 `Next.js 15` · `Rust + Axum` · `Soroban Smart Contract` · `Stellar Testnet` · `SQLite` · `NASA POWER API` · `Freighter Wallet`
 
 ---
-
-## Ver en vivo
-
-**[techrebel.world/product/cenzo/dashboard](https://www.techrebel.world/product/cenzo/dashboard)**
 
 ---
 
