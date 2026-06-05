@@ -43,6 +43,8 @@
     "@types/node": "^22.15.29",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "16.2.7",
     "jsdom": "^29.1.1",
     "tsx": "^4.22.3",
     "typescript": "^5.8.3",
