@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌱 Censo
+# 🌱 Cenzo
 
 ### Trazabilidad agrícola verificable en Stellar · Soroban
 
@@ -15,9 +15,9 @@
 
 ---
 
-## ¿Qué es Censo?
+## ¿Qué es Cenzo?
 
-Censo es una plataforma de **trazabilidad on-chain para cadenas de valor agrícolas**. Cada lote de café recibe un **NFT en Soroban** cuyo historial de eventos está anclado mediante hashes SHA-256 en el contrato inteligente, haciendo que cualquier alteración de los datos sea detectable de forma criptográfica.
+Cenzo es una plataforma de **trazabilidad on-chain para cadenas de valor agrícolas**. Cada lote de café recibe un **NFT en Soroban** cuyo historial de eventos está anclado mediante hashes SHA-256 en el contrato inteligente, haciendo que cualquier alteración de los datos sea detectable de forma criptográfica.
 
 El agricultor puede mostrar un QR al comprador. El comprador escanea y ve el recorrido completo del lote — de la semilla al tostador — verificado por la blockchain de Stellar.
 
@@ -31,7 +31,7 @@ SHA-256 anchored in Soroban smart contract on every step
 
 ## Problema que resuelve
 
-| Sin Censo | Con Censo |
+| Sin Cenzo | Con Cenzo |
 |-----------|-----------|
 | El origen del café es una declaración de fe | El origen está firmado por la finca y anclado on-chain |
 | El comprador no puede auditar el proceso | Cualquier persona puede verificar con un QR |
@@ -225,7 +225,7 @@ AUTH_GOOGLE_ID=<Google OAuth client id>
 AUTH_GOOGLE_SECRET=<Google OAuth secret>
 
 # apps/api/.env
-DATABASE_URL=sqlite://censo.db
+DATABASE_URL=sqlite://cenzo.db
 CONTRACT_ID=<contract address en testnet>
 KEY_NAME=<nombre de la llave stellar>
 NETWORK=testnet
@@ -256,7 +256,7 @@ npm run dev
 cd apps/contract
 stellar contract build
 stellar contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/censo_contract.wasm \
+  --wasm target/wasm32-unknown-unknown/release/cenzo_contract.wasm \
   --network testnet \
   --source <admin-key>
 ```
@@ -289,7 +289,7 @@ stellar contract deploy \
                Grado A-F generado
                SVG del certificado disponible en /api/nft-image/:id
 
-5. QR al comprador  →  censo.app/t/:id
+5. QR al comprador  →  cenzo.app/t/:id
                          ↓
                      Página pública sin login
                      Estado verificado contra Soroban
@@ -300,7 +300,7 @@ stellar contract deploy \
 ## Estructura del repositorio
 
 ```
-censo/
+cenzo/
 ├── apps/
 │   ├── web/                    # Next.js 15
 │   │   ├── app/
@@ -314,7 +314,7 @@ censo/
 │   │   ├── components/
 │   │   │   └── dashboard/      # Componentes del dashboard
 │   │   └── lib/
-│   │       └── censo-api.ts    # Cliente del backend
+│   │       └── cenzo-api.ts    # Cliente del backend
 │   │
 │   └── api/                    # Rust + Axum
 │       ├── src/
@@ -354,7 +354,7 @@ Construido para la **Stellar Hackathon 2026** por **Esteban Canales**.
 
 <div align="center">
 
-**[Ver Demo](https://censo.app)** · **[Contrato en Testnet](https://stellar.expert/explorer/testnet)**
+**[Ver Demo](https://cenzo.app)** · **[Contrato en Testnet](https://stellar.expert/explorer/testnet)**
 
 Made with ☕ and Soroban
 
