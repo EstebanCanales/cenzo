@@ -61,3 +61,11 @@ export async function getLote(id: number | string): Promise<LoteView | null> {
   if (!res.ok) throw new Error(`getLote falló: ${res.status}`);
   return res.json();
 }
+
+/** Lectura pública (sin auth) — target del QR del empaque. */
+export async function getPublicLote(id: number | string): Promise<LoteView | null> {
+  const res = await fetch(`${CENSO_API_URL}/public/lotes/${id}`, { cache: "no-store" });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`getPublicLote falló: ${res.status}`);
+  return res.json();
+}

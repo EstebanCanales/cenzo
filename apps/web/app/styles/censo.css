@@ -121,3 +121,208 @@
 .spin {
   animation: censo-spin 0.9s linear infinite;
 }
+
+/* ---- Página pública del consumidor (/t/[id]) ---- */
+
+.pub {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 18px 56px;
+  display: grid;
+  gap: 20px;
+}
+
+.pub-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.pub-brand small {
+  color: var(--muted, #888);
+  font-weight: 500;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.pub-card {
+  background: var(--surface, #fff);
+  border: 1px solid var(--line, #f0f0f0);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.pub-hero {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.pub-hero__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--green-soft, #edfaf3);
+  color: var(--green-strong, #1a7a4a);
+}
+
+.pub-eyebrow {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted, #888);
+}
+
+.pub-hero h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.pub-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.pub-tier--diamante {
+  background: linear-gradient(135deg, #e6f7ff, #edfaf3);
+  color: #0e7490;
+  border: 1px solid #a5e4f0;
+}
+
+.pub-tier--oro {
+  background: #fff7e0;
+  color: #b7791f;
+  border: 1px solid #f3d98b;
+}
+
+.pub-tier--plata {
+  background: #f4f5f7;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.pub-tier--none {
+  background: var(--surface-soft, #fafafa);
+  color: var(--muted, #888);
+  border: 1px solid var(--line, #f0f0f0);
+}
+
+.pub-integrity {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 10px;
+}
+
+.pub-integrity--ok {
+  background: var(--green-soft, #edfaf3);
+  color: var(--green-strong, #1a7a4a);
+}
+
+.pub-integrity--warn {
+  background: #fff7e6;
+  color: #b7791f;
+}
+
+.pub-trace h2 {
+  font-size: 16px;
+  margin: 0 0 14px;
+}
+
+.pub-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.pub-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+}
+
+.pub-step__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--green-strong, #1a7a4a);
+  margin: 5px auto 0;
+  position: relative;
+  z-index: 1;
+}
+
+.pub-step:not(:last-child) .pub-step__dot::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: calc(100% + 22px);
+  background: var(--line-strong, #e5e5e5);
+}
+
+.pub-step__body {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 22px;
+}
+
+.pub-step__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pub-step__actor {
+  color: var(--muted, #888);
+  font-size: 13px;
+}
+
+.pub-step__data {
+  margin: 2px 0 0;
+  display: grid;
+  gap: 4px;
+}
+
+.pub-step__data > div {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.pub-step__data dt {
+  color: var(--muted, #888);
+  min-width: 90px;
+}
+
+.pub-step__data dd {
+  margin: 0;
+  font-weight: 500;
+}
+
+.pub-footer {
+  color: var(--muted, #888);
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.5;
+  border-top: 1px solid var(--line, #f0f0f0);
+  padding-top: 18px;
+}

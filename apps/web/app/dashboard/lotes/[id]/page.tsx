@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { LoteActions } from "@/components/dashboard/lote-actions";
+import { LoteQr } from "@/components/dashboard/lote-qr";
 import { Badge } from "@/components/ui/badge";
 import { explorerTx, getLote, type EventView } from "@/lib/censo-api";
 
@@ -136,7 +137,8 @@ export default async function LoteDetailPage({
           </div>
         </section>
 
-        <aside>
+        <aside style={{ display: "grid", gap: 16 }}>
+          <LoteQr loteId={lote.id} />
           <LoteActions loteId={lote.id} />
         </aside>
       </div>
