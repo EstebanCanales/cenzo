@@ -15,9 +15,9 @@ export default async function HomePage() {
 
       {/* Animated background blobs */}
       <div className="pointer-events-none select-none absolute inset-0 -z-10">
-        <div className="absolute top-[-10%] left-[-5%] w-[520px] h-[520px] rounded-full bg-emerald-200/40 blur-[120px] animate-[pulse_8s_ease-in-out_infinite]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[480px] h-[480px] rounded-full bg-violet-200/30 blur-[100px] animate-[pulse_10s_ease-in-out_2s_infinite]" />
-        <div className="absolute top-[40%] left-[40%] w-[300px] h-[300px] rounded-full bg-blue-100/30 blur-[80px] animate-[pulse_12s_ease-in-out_4s_infinite]" />
+        <div className="blob-1 absolute top-[-10%] left-[-5%] w-[520px] h-[520px] rounded-full bg-emerald-200/50 blur-[100px]" />
+        <div className="blob-2 absolute bottom-[-10%] right-[-5%] w-[480px] h-[480px] rounded-full bg-violet-200/40 blur-[90px]" />
+        <div className="blob-3 absolute top-[35%] left-[35%] w-[320px] h-[320px] rounded-full bg-blue-100/40 blur-[80px]" />
       </div>
 
       {/* Logo + título */}

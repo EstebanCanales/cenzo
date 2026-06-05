@@ -1,3 +1,24 @@
+@keyframes blob1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(40px, -30px) scale(1.08); }
+  66%       { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes blob2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(-30px, 40px) scale(1.05); }
+  66%       { transform: translate(25px, -15px) scale(0.97); }
+}
+
+@keyframes blob3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(20px, 30px) scale(1.1); }
+}
+
+.blob-1 { animation: blob1 9s ease-in-out infinite; }
+.blob-2 { animation: blob2 11s ease-in-out 2s infinite; }
+.blob-3 { animation: blob3 13s ease-in-out 4s infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
