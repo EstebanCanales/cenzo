@@ -76,7 +76,7 @@ El NFT del lote lleva la imagen del certificado generada dinámicamente — úni
 
 <div align="center">
 
-*Enviado a **Morpho Studio** · Esteban Canales · 2026*
+*Enviado a **Morpho Studio** · 2026*
 
 > *"El agricultor tiene el trabajo más honesto del mundo. La tecnología debería hacer ese honor visible."*
 
