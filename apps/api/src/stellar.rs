@@ -20,10 +20,15 @@ struct InvokeOutput {
 impl Stellar {
     pub fn new(contract_id: String, key_name: String, network: String) -> Self {
         let bin = std::env::var("STELLAR_BIN").unwrap_or_else(|_| "stellar".into());
+        // En producción (Railway) ADMIN_SECRET_KEY permite pasar la clave directamente
+        // como --source sin depender del keystore local del CLI.
+        let source = std::env::var("ADMIN_SECRET_KEY")
+            .filter(|s| s.starts_with('S') && s.len() == 56)
+            .unwrap_or(key_name);
         Self {
             bin,
             contract_id,
-            key_name,
+            key_name: source,
             network,
         }
     }

@@ -43,7 +43,7 @@ async fn main() -> anyhow::Result<()> {
         config: Arc::new(config.clone()),
     };
 
-    let addr = format!("127.0.0.1:{}", config.api_port);
+    let addr = format!("0.0.0.0:{}", config.api_port);
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     println!("[censo-api] escuchando en http://{addr}");
     axum::serve(listener, routes::router(state)).await?;
