@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Blocks, ChevronDown, Home, Leaf, LogOut, Menu, ShieldCheck } from "lucide-react";
+import { BarChart3, Blocks, ChevronDown, Home, Leaf, LogOut, Menu, ShieldCheck, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -15,10 +15,10 @@ import {
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/dashboard", label: "Overview", icon: Home },
-  { href: "/dashboard/lotes", label: "Lotes on-chain", icon: ShieldCheck },
-  { href: "/dashboard/products", label: "Products", icon: Blocks },
-  { href: "/dashboard/graphs", label: "Graphs", icon: BarChart3 },
+  { href: "/dashboard",          label: "Overview",       icon: Home },
+  { href: "/dashboard/lotes",    label: "Lotes on-chain", icon: ShieldCheck },
+  { href: "/dashboard/products", label: "Products",       icon: Blocks },
+  { href: "/dashboard/graphs",   label: "Graphs",         icon: BarChart3 },
 ];
 
 type SidebarClientProps = {
@@ -34,70 +34,101 @@ export function SidebarClient({ name, email, initials, onSignOut }: SidebarClien
 
   return (
     <>
+      {/* Mobile toggle */}
       <button
-        className="mobile-sidebar-toggle"
+        className="md:hidden fixed top-4 left-4 z-50 flex items-center gap-2 text-xs font-semibold px-3 py-2 rounded-lg border border-[var(--line)] bg-white shadow-sm"
         onClick={() => setOpen((v) => !v)}
         type="button"
       >
-        <Menu size={18} />
+        {open ? <X size={15} /> : <Menu size={15} />}
         Menu
       </button>
 
-      <aside className={cn("app-sidebar", open && "app-sidebar--open")}>
-        <div className="app-sidebar__brand">
-          <div className="app-sidebar__logo">
-            <Leaf size={16} />
+      {/* Backdrop mobile */}
+      {open && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/20"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Sidebar rail */}
+      <aside
+        className={cn(
+          "flex flex-col shrink-0 w-[240px] h-dvh",
+          "overflow-y-auto overflow-x-hidden [scrollbar-width:none]",
+          "border-r border-[var(--line)] bg-[var(--surface)]",
+          "max-md:fixed max-md:top-0 max-md:left-0 max-md:z-50 max-md:shadow-xl",
+          "max-md:transition-transform max-md:duration-200",
+          open ? "max-md:translate-x-0" : "max-md:-translate-x-full",
+        )}
+      >
+        {/* Brand */}
+        <div className="flex items-center gap-2.5 px-4 py-5 border-b border-[var(--line)]">
+          <div className="w-7 h-7 rounded-lg grid place-items-center bg-[var(--graphite)] text-[var(--green)] shrink-0">
+            <Leaf size={14} />
           </div>
-          <div>
-            <p>Censo</p>
-            <span>agri trust layer</span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-bold tracking-tight leading-none mb-0.5">Censo</p>
+            <span className="text-[10px] text-[var(--muted)]">agri trust layer</span>
           </div>
         </div>
 
-        <nav className="app-sidebar__nav">
+        {/* Nav */}
+        <nav className="flex flex-col gap-0.5 p-3 flex-1">
           {navItems.map((item) => {
             const active =
               item.href === "/dashboard"
                 ? pathname === item.href
                 : pathname.startsWith(item.href);
             const Icon = item.icon;
-
             return (
               <Link
                 key={item.href}
-                className={cn("app-sidebar__link", active && "app-sidebar__link--active")}
                 href={item.href}
                 onClick={() => setOpen(false)}
+                className={cn(
+                  "relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors",
+                  active
+                    ? "bg-[var(--surface-soft)] text-[var(--text-strong)] font-semibold"
+                    : "text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-soft)]",
+                )}
               >
                 <Icon size={14} />
                 <span>{item.label}</span>
-                {active ? <span className="app-sidebar__link-indicator" /> : null}
+                {active && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--green)]" />
+                )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="app-sidebar__bottom">
-          <div className="app-sidebar__story">
-            <span>Stellar</span>
-            <p>Verifica evidencia y reduce manipulación en la cadena agrícola.</p>
+        {/* Bottom */}
+        <div className="flex flex-col gap-2 p-3 pt-0">
+          <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] px-3 py-2.5">
+            <span className="block text-[9px] font-bold tracking-widest uppercase text-[var(--muted)] mb-1">
+              Stellar
+            </span>
+            <p className="text-[10px] text-[var(--muted)] leading-relaxed m-0">
+              Verifica evidencia y reduce manipulación en la cadena agrícola.
+            </p>
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="sidebar-account" type="button">
-                <Avatar>
-                  <AvatarFallback>{initials}</AvatarFallback>
+              <button
+                type="button"
+                className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg border-t border-[var(--line)] hover:bg-[var(--surface-soft)] transition-colors cursor-pointer"
+              >
+                <Avatar className="h-7 w-7 shrink-0">
+                  <AvatarFallback className="text-[11px]">{initials}</AvatarFallback>
                 </Avatar>
-                <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                  <strong style={{ display: "block", fontSize: "11px", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {name}
-                  </strong>
-                  <span style={{ display: "block", fontSize: "10px", color: "var(--muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {email}
-                  </span>
+                <div className="flex-1 min-w-0 text-left">
+                  <strong className="block text-[11px] font-semibold truncate">{name}</strong>
+                  <span className="block text-[10px] text-[var(--muted)] truncate">{email}</span>
                 </div>
-                <ChevronDown size={14} style={{ color: "var(--muted)", flexShrink: 0 }} />
+                <ChevronDown size={13} className="text-[var(--muted)] shrink-0" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="top">

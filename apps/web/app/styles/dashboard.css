@@ -1,26 +1,10 @@
-.app-frame {
-  min-height: 100dvh;
-  padding: 0;
-}
+/* ── App shell — sidebar fijo, contenido scrolleable ──────────── */
 
-.lab-layout {
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 24px;
-  align-items: start;
-  min-height: 100dvh;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  padding: 24px;
-}
 
-.lab-main {
-  min-width: 0;
-  padding: 24px 24px 32px;
-}
+
+
+
+
 
 .lab-header {
   display: flex;
@@ -51,15 +35,20 @@
 }
 
 .app-sidebar {
-  position: sticky;
-  top: 14px;
   display: flex;
-  min-height: calc(100dvh - 28px);
+  height: 100dvh;
   flex-direction: column;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
+  border-right: 1px solid var(--line);
   background: var(--surface);
-  padding: 16px 12px;
+  padding: 20px 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.app-sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .app-sidebar__brand {
@@ -1800,17 +1789,11 @@
     min-height: 100dvh;
   }
 
-  .lab-layout--overview .app-sidebar {
-    min-height: calc(100dvh - 28px);
-    top: 14px;
-  }
-
   .lab-layout--overview .lab-main {
     display: flex;
-    height: calc(100dvh - 28px);
     flex-direction: column;
-    overflow: visible;
-    padding: 8px 0 14px;
+    overflow-y: auto;
+    padding: 28px 32px 32px;
   }
 
   .lab-layout--overview .lab-header {
@@ -1951,21 +1934,41 @@
   }
 
 
+  .app-frame {
+    display: block;
+  }
+
+  .lab-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+
+  .lab-main {
+    height: auto;
+    overflow-y: visible;
+    padding: 16px 16px 40px;
+  }
+
   .app-sidebar {
     position: fixed;
-    top: 72px;
-    right: 12px;
-    left: 12px;
-    z-index: 40;
-    height: auto;
-    transform: translateY(-12px);
-    opacity: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 50;
+    height: 100dvh;
+    border-right: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    opacity: 1;
     pointer-events: none;
   }
 
   .app-sidebar--open {
-    transform: translateY(0);
-    opacity: 1;
+    transform: translateX(0);
     pointer-events: auto;
   }
 

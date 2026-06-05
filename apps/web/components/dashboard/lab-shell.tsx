@@ -23,9 +23,18 @@ export function LabShell({
   children,
 }: LabShellProps) {
   return (
-    <div className={cn("lab-layout", variant !== "default" && `lab-layout--${variant}`)}>
+    <>
+      {/* Sidebar — fixed rail, no scroll visible */}
       <AppSidebar />
-      <main className="lab-main">
+
+      {/* Main content — full height, scrolleable */}
+      <main
+        className={cn(
+          "flex-1 min-w-0 h-dvh overflow-y-auto",
+          "px-8 py-7",
+          variant === "overview" && "lab-layout--overview",
+        )}
+      >
         {!hideHeader && (
           <header className="lab-header">
             <div className="lab-header__copy">
@@ -38,6 +47,6 @@ export function LabShell({
         )}
         <div className="lab-content">{children}</div>
       </main>
-    </div>
+    </>
   );
 }

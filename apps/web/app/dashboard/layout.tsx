@@ -10,6 +10,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     redirect("/");
   }
 
-  return <div className="app-frame">{children}</div>;
+  return (
+    <div className="flex h-dvh overflow-hidden bg-white">
+      {children}
+    </div>
+  );
 }
 
