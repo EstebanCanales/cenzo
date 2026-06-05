@@ -12,8 +12,8 @@
 <br/>
 
 [![Stellar](https://img.shields.io/badge/Stellar-Soroban-7C3AED?logo=stellar&logoColor=white&style=for-the-badge)](https://stellar.org)
-[![Live Demo](https://img.shields.io/badge/Demo-cenzo.app-22c55e?style=for-the-badge)](https://cenzo.app)
-[![Hackathon](https://img.shields.io/badge/Stellar_Hackathon-2026-F59E0B?style=for-the-badge)](https://stellar.org)
+[![Live Demo](https://img.shields.io/badge/Demo-techrebel.world-22c55e?style=for-the-badge)](https://www.techrebel.world/product/cenzo/dashboard)
+[![Morpho Studio](https://img.shields.io/badge/Morpho_Studio-Competencia-F59E0B?style=for-the-badge)](https://www.techrebel.world/product/cenzo/dashboard)
 
 </div>
 
@@ -77,23 +77,15 @@ El NFT del lote lleva la imagen del certificado generada dinámicamente — úni
 
 ---
 
-## Demo rápida
+## Ver en vivo
 
-```bash
-# Backend
-cd apps/api && cargo run
-
-# Frontend
-cd apps/web && npm run dev
-```
-
-Abrí `http://localhost:3001` — conectá con Freighter o Google, y explorá los lotes on-chain.
+**[techrebel.world/product/cenzo/dashboard](https://www.techrebel.world/product/cenzo/dashboard)**
 
 ---
 
 <div align="center">
 
-*Construido para la **Stellar Hackathon 2026** · Esteban Canales*
+*Enviado a **Morpho Studio** · Esteban Canales · 2026*
 
 > *"El agricultor tiene el trabajo más honesto del mundo. La tecnología debería hacer ese honor visible."*
 
