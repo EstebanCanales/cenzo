@@ -365,6 +365,7 @@
 /* Stellar contract flow */
 .stellar-flow {
   gap: 14px;
+  max-height: 480px;
 }
 
 .stellar-workers {
@@ -418,6 +419,7 @@
   grid-template-columns: 1fr 1fr;
   flex: 1;
   min-height: 0;
+  height: 0; /* fuerza que flex-1 se respete con max-height en el padre */
   gap: 0;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -637,10 +639,12 @@
 }
 
 .stellar-stage__cards--scroll {
-  overflow-y: auto;
+  overflow-y: auto !important;
   scrollbar-width: thin;
   scrollbar-color: var(--line-strong) transparent;
 }
+
+
 
 .stellar-stage__count--green {
   background: rgba(26,122,74,0.12);

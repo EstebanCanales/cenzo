@@ -2,6 +2,8 @@
 
 import dynamic from "next/dynamic";
 
+import type { LoteSummary } from "@/lib/censo-api";
+
 const StellarContractFlowInner = dynamic(
   () =>
     import("@/components/dashboard/stellar-contract-flow").then((m) => ({
@@ -10,6 +12,6 @@ const StellarContractFlowInner = dynamic(
   { ssr: false }
 );
 
-export function StellarContractFlowClient() {
-  return <StellarContractFlowInner />;
+export function StellarContractFlowClient({ lotes = [] }: { lotes?: LoteSummary[] }) {
+  return <StellarContractFlowInner lotes={lotes} />;
 }

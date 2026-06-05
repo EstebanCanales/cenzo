@@ -5,15 +5,16 @@ import { SensorPanel } from "@/components/dashboard/sensor-panel";
 import { StellarContractFlowClient } from "@/components/dashboard/stellar-contract-flow-client";
 import { auth } from "@/auth";
 import { dashboardInsights, dashboardMetrics, getGreetingByDate } from "@/lib/dashboard";
-import { getClimate, listSensorReadings } from "@/lib/censo-api";
+import { getClimate, listLotes, listSensorReadings, type LoteSummary } from "@/lib/censo-api";
 
 export default async function DashboardPage() {
   const session = await auth();
   const user = session?.user?.name ?? "Operator";
   const greeting = getGreetingByDate(new Date());
-  const [readings, climate] = await Promise.all([
+  const [readings, climate, lotes] = await Promise.all([
     listSensorReadings(),
     getClimate(9.9281, -84.0907, 7),
+    listLotes().catch(() => [] as LoteSummary[]),
   ]);
 
   return (
@@ -53,7 +54,7 @@ export default async function DashboardPage() {
       </div>
 
       <MotionFade delay={0.08} className="overview-full">
-        <StellarContractFlowClient />
+        <StellarContractFlowClient lotes={lotes} />
       </MotionFade>
 
       <MotionFade delay={0.12} className="overview-full">
