@@ -1,8 +1,16 @@
-import { Activity, RadioTower, ShieldCheck, TriangleAlert } from "lucide-react";
+import { Activity, Edit3, ExternalLink, RadioTower, ShieldCheck, TriangleAlert } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 import { ProductDrawer } from "@/components/dashboard/product-drawer";
-import { ProductAssetCard } from "@/components/dashboard/product-asset-card";
 import { products } from "@/lib/dashboard";
+import { Badge } from "@/components/ui/badge";
+
+const riskBadge = {
+  low: "green",
+  medium: "slate",
+  high: "gold",
+} as const;
 
 export function ProductGrid() {
   const verifiedCount = products.filter((product) => product.status === "Verified").length;
@@ -13,42 +21,99 @@ export function ProductGrid() {
     <section className="products-section">
       <div className="products-board">
         <div className="products-hero">
-          <div>
-            <p className="section-kicker">Products</p>
-            <h2>Inventario vivo de lotes, sensores y evidencia Stellar.</h2>
+          <div className="products-hero__copy">
+            <p className="section-kicker">Operational inventory</p>
+            <h2>Lotes y evidencia Stellar</h2>
             <p>
-              Cada card resume origen, riesgo, ultima prueba y cadena de manipulacion sin convertir la pantalla en una
-              tabla.
+              Gestiona unidades de trazabilidad, verifica integridad de datos on-chain y monitorea sensores en tiempo real.
             </p>
           </div>
           <div className="products-hero__stats">
             <span>
-              <ShieldCheck size={16} />
+              <ShieldCheck size={18} />
               <strong>{verifiedCount}</strong>
-              verified
+              Verified
             </span>
             <span>
-              <TriangleAlert size={16} />
+              <TriangleAlert size={18} />
               <strong>{reviewCount}</strong>
-              review
+              Review
             </span>
             <span>
-              <RadioTower size={16} />
+              <RadioTower size={18} />
               <strong>{liveSensors}</strong>
-              live sensors
+              Live
             </span>
           </div>
           <div className="products-hero__action">
-            <Activity size={16} />
-            <span>Operational trace board</span>
+            <span>
+              <Activity size={16} />
+              Inventory scannability active
+            </span>
             <ProductDrawer mode="add" triggerLabel="Agregar producto" />
           </div>
         </div>
 
-        <div className="products-grid">
-          {products.map((product) => (
-            <ProductAssetCard key={product.id} product={product} />
-          ))}
+        <div className="product-list">
+          <header className="product-list-header">
+            <div>Asset</div>
+            <div>Name & Category</div>
+            <div>Status</div>
+            <div>Origin</div>
+            <div>Verified</div>
+            <div>Score</div>
+            <div style={{ textAlign: "right" }}>Actions</div>
+          </header>
+
+          {products.map((product) => {
+            const needsReview = product.riskLevel === "high" || product.status === "Needs review";
+            
+            return (
+              <article key={product.id} className="product-list-item">
+                <div className="product-list-item__thumb">
+                  <Image
+                    alt={product.name}
+                    fill
+                    src={product.assetSrc}
+                    sizes="48px"
+                  />
+                </div>
+                
+                <div className="product-list-item__info">
+                  <h3>{product.name}</h3>
+                  <p>{product.category}</p>
+                </div>
+
+                <div>
+                  <Badge variant={riskBadge[product.riskLevel]}>
+                    {needsReview ? <TriangleAlert size={12} /> : <ShieldCheck size={12} />}
+                    {product.status}
+                  </Badge>
+                </div>
+
+                <div className="product-list-item__meta">
+                  <span>{product.origin}</span>
+                  <small>Source</small>
+                </div>
+
+                <div className="product-list-item__meta">
+                  <span>{product.lastVerifiedAt}</span>
+                  <small>Audit date</small>
+                </div>
+
+                <div>
+                  <span className="product-list-item__score">{product.traceabilityScore}</span>
+                </div>
+
+                <div className="product-list-item__actions">
+                  <ProductDrawer mode="edit" product={product} triggerLabel="Edit" />
+                  <Link className="icon-link" href={`/dashboard/products/${product.id}`}>
+                    <ExternalLink size={16} />
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

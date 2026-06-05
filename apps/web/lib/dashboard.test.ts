@@ -88,6 +88,11 @@ describe("Soft Connected OS style contract", () => {
     expect(dashboardCss).not.toContain("max-height: calc(100dvh - 72px)");
   });
 
+  it("gives the graphs route a dedicated shell treatment", () => {
+    expect(graphsPage).toContain('variant="graphs"');
+    expect(dashboardCss).toContain(".lab-layout--graphs");
+  });
+
   it("upgrades products and graphs with route-specific visual treatments", () => {
     expect(productGrid).toContain("products-board");
     expect(productGrid).toContain("products-hero");

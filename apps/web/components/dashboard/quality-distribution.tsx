@@ -10,10 +10,15 @@ export function QualityDistribution({ detailed = false }: QualityDistributionPro
 
   return (
     <section className={`lab-chart quality-panel ${detailed ? "quality-panel--detailed" : ""}`}>
-      <div className="lab-chart__header">
+      <div className="lab-chart__header quality-panel__header">
         <div>
           <p className="lab-kicker">Quality</p>
           <h2>Lot distribution</h2>
+          {detailed ? (
+            <p className="lab-chart__lede">
+              Approval confidence, watch-list share and recovery capacity at a glance.
+            </p>
+          ) : null}
         </div>
         <span>{total} lots</span>
       </div>
@@ -44,8 +49,8 @@ export function QualityDistribution({ detailed = false }: QualityDistributionPro
             ))}
           </div>
           <p>
-            La lectura combina inspeccion de calidad, evidencia de sensor y estado de aprobacion antes de liberar el
-            siguiente movimiento.
+            La lectura combina inspeccion de calidad, evidencia de sensor y estado de aprobacion
+            antes de liberar el siguiente movimiento.
           </p>
         </div>
       ) : null}

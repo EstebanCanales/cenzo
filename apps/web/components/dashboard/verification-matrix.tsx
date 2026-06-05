@@ -27,7 +27,7 @@ type VerificationMatrixProps = {
   detailed?: boolean;
 };
 
-export function VerificationMatrix({ compact = false }: VerificationMatrixProps) {
+export function VerificationMatrix({ compact = false, detailed = false }: VerificationMatrixProps) {
   const stages = verificationMatrix.rows[0]?.cells.map((c) => c.stage) ?? [];
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -45,10 +45,13 @@ export function VerificationMatrix({ compact = false }: VerificationMatrixProps)
 
   return (
     <section ref={ref} className={`lab-chart lab-chart--flex matrix-panel ${compact ? "matrix-panel--compact" : ""}`}>
-      <div className="lab-chart__header">
+      <div className="lab-chart__header matrix-panel__header">
         <div>
           <p className="lab-kicker">Matrix</p>
           <h2>Stage verification</h2>
+          {detailed ? (
+            <p className="lab-chart__lede">Cross-check crop readiness against each operational stage.</p>
+          ) : null}
         </div>
         <span>By crop</span>
       </div>

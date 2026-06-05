@@ -23,7 +23,7 @@ type TrendChartProps = {
   detailed?: boolean;
 };
 
-export function TrendChart({ compact = false }: TrendChartProps) {
+export function TrendChart({ compact = false, detailed = false }: TrendChartProps) {
   const points = verificationTrend.points;
   const totalVerified = points.reduce((s, p) => s + p.verified, 0);
   const totalPending = points.reduce((s, p) => s + p.pending, 0);
@@ -33,10 +33,15 @@ export function TrendChart({ compact = false }: TrendChartProps) {
 
   return (
     <section ref={ref} className={`lab-chart lab-chart--flex trend-panel ${compact ? "trend-panel--compact" : ""}`}>
-      <div className="lab-chart__header">
+      <div className="lab-chart__header trend-panel__header">
         <div>
           <p className="lab-kicker">Velocity</p>
           <h2>{verificationTrend.title}</h2>
+          {detailed ? (
+            <p className="lab-chart__lede">
+              Verified flow stays ahead while pending proofs remain contained.
+            </p>
+          ) : null}
         </div>
         <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 700, color: "var(--green)" }}>
           {proofRate}% proof rate

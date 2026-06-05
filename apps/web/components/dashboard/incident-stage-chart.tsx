@@ -10,10 +10,13 @@ export function IncidentStageChart({ detailed = false }: IncidentStageChartProps
 
   return (
     <section className={`lab-chart incident-panel ${detailed ? "incident-panel--detailed" : ""}`}>
-      <div className="lab-chart__header">
+      <div className="lab-chart__header incident-panel__header">
         <div>
           <p className="lab-kicker">Incidents</p>
           <h2>Review pressure</h2>
+          {detailed ? (
+            <p className="lab-chart__lede">Stage-level friction ranked by operational pressure.</p>
+          ) : null}
         </div>
         <span>{total} open signals</span>
       </div>
@@ -28,7 +31,11 @@ export function IncidentStageChart({ detailed = false }: IncidentStageChartProps
               />
             </div>
             <strong>{item.count}</strong>
-            {detailed ? <small className={`incident-stage-chart__tag incident-stage-chart__tag--${item.severity}`}>{item.severity}</small> : null}
+            {detailed ? (
+              <small className={`incident-stage-chart__tag incident-stage-chart__tag--${item.severity}`}>
+                {item.severity}
+              </small>
+            ) : null}
           </div>
         ))}
       </div>
