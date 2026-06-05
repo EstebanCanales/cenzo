@@ -47,12 +47,15 @@ cp .env.example .env
 Editar `apps/api/.env`:
 
 ```env
-DATABASE_URL=sqlite://censo.db
-CONTRACT_ID=<dirección del contrato Soroban en Testnet>
-KEY_NAME=dev-key
-NETWORK=testnet
-ADMIN_SECRET_KEY=<clave secreta del admin>
+DATABASE_URL=sqlite://censo.db?mode=rwc
+CENSO_CONTRACT_ID=<dirección del contrato Soroban en Testnet>
+ADMIN_KEY_NAME=dev-key
+ADMIN_SECRET_KEY=<clave secreta S... del admin>
+STELLAR_NETWORK=testnet
+SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
 API_PORT=4000
+API_SHARED_SECRET=
 ```
 
 **Generar la clave `dev-key` para Testnet:**
@@ -232,75 +235,39 @@ DATABASE_URL=sqlite:///data/censo.db
 En Railway → servicio `api` → **Variables**, agregar:
 
 ```env
-DATABASE_URL=sqlite:///data/censo.db
-CONTRACT_ID=<dirección del contrato en Stellar Testnet>
-KEY_NAME=admin-key
-NETWORK=testnet
-ADMIN_SECRET_KEY=<clave secreta del admin — NUNCA commitear>
+DATABASE_URL=sqlite:///data/censo.db?mode=rwc
+CENSO_CONTRACT_ID=<dirección del contrato en Stellar Testnet>
+ADMIN_KEY_NAME=censo-admin
+ADMIN_SECRET_KEY=<clave secreta S... del admin — marcar como Secret en Railway>
+STELLAR_NETWORK=testnet
+SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
 API_PORT=8080
+API_SHARED_SECRET=<openssl rand -hex 32>
 STELLAR_BIN=/usr/local/bin/stellar
 ```
 
-> Railway expone el puerto automáticamente. Usar `8080` como `API_PORT` en producción.
+> `ADMIN_SECRET_KEY` se usa directamente como `--source` en las llamadas al CLI — no se necesita configurar un keystore en el contenedor.
 
-#### 2d. Instalar stellar-cli en el contenedor
+#### 2d. El Dockerfile ya está incluido
 
-Railway usa un builder Nixpacks. Crear `apps/api/nixpacks.toml` si no existe:
+El repositorio incluye `apps/api/Dockerfile` con un build de 3 etapas:
+
+1. **Stage 1** — compila `stellar-cli` (cacheado independientemente)
+2. **Stage 2** — compila `censo-api` con cache de dependencias
+3. **Stage 3** — imagen runtime mínima (`debian:bookworm-slim`) con los dos binarios
+
+Railway detecta el `Dockerfile` automáticamente gracias a `apps/api/railway.toml`:
 
 ```toml
-[phases.setup]
-nixPkgs = ["openssl", "pkg-config"]
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
-[phases.build]
-cmds = [
-  "cargo install --locked stellar-cli --features opt",
-  "cargo build --release"
-]
-
-[start]
-cmd = "./target/release/api"
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
 ```
-
-Alternativamente, si usás un `Dockerfile` propio en `apps/api/`:
-
-```dockerfile
-FROM rust:1.78-slim AS builder
-WORKDIR /app
-COPY . .
-RUN apt-get update && apt-get install -y pkg-config libssl-dev
-RUN cargo install --locked stellar-cli --features opt
-RUN cargo build --release
-
-FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/target/release/api /usr/local/bin/api
-COPY --from=builder /root/.cargo/bin/stellar /usr/local/bin/stellar
-COPY --from=builder /app/migrations /migrations
-EXPOSE 8080
-CMD ["api"]
-```
-
-#### 2e. Agregar las claves Stellar al contenedor
-
-El contenedor necesita la clave del admin en el keystore de `stellar-cli`. Opciones:
-
-**Opción A — Via variable de entorno (recomendado):**
-
-Agregar en Railway la variable `ADMIN_SECRET_KEY` con la clave secreta. En el backend, antes de invocar el CLI, escribir la clave en el keystore al arrancar:
-
-```rust
-// Al iniciar la app, si KEY_NAME no existe:
-// stellar keys add <KEY_NAME> --secret-key <ADMIN_SECRET_KEY>
-```
-
-**Opción B — Via stellar-cli directamente en el Dockerfile:**
-
-```dockerfile
-RUN stellar keys add admin-key \
-    --secret-key ${ADMIN_SECRET_KEY}
-```
-
-> Asegurarse de que `ADMIN_SECRET_KEY` sea un secret de Railway (no una variable pública).
 
 ---
 
@@ -394,12 +361,15 @@ railway logs --service web
 
 | Variable | Descripción | Ejemplo |
 |----------|-------------|---------|
-| `DATABASE_URL` | Ruta del archivo SQLite | `sqlite:///data/censo.db` |
-| `CONTRACT_ID` | Dirección del contrato Soroban en Testnet | `CABCD...` |
-| `KEY_NAME` | Nombre de la clave en el keystore de stellar-cli | `admin-key` |
-| `NETWORK` | Red Stellar | `testnet` |
-| `ADMIN_SECRET_KEY` | Clave secreta del admin (secret en Railway) | `SXXX...` |
+| `DATABASE_URL` | Ruta del archivo SQLite | `sqlite:///data/censo.db?mode=rwc` |
+| `CENSO_CONTRACT_ID` | Dirección del contrato Soroban en Testnet | `CABCD...` |
+| `ADMIN_KEY_NAME` | Alias de la clave en el keystore (solo dev local) | `dev-key` |
+| `ADMIN_SECRET_KEY` | Clave secreta S... del admin — marcar como Secret | `SXXX...` |
+| `STELLAR_NETWORK` | Red Stellar | `testnet` |
+| `SOROBAN_RPC_URL` | RPC del nodo Soroban | `https://soroban-testnet.stellar.org` |
+| `STELLAR_NETWORK_PASSPHRASE` | Passphrase de la red | `Test SDF Network ; September 2015` |
 | `API_PORT` | Puerto HTTP | `8080` (Railway), `4000` (local) |
+| `API_SHARED_SECRET` | Secreto server-a-server para rutas de escritura | `openssl rand -hex 32` |
 | `STELLAR_BIN` | Path al binario stellar-cli | `/usr/local/bin/stellar` |
 
 ### `apps/web` (frontend)
@@ -439,7 +409,7 @@ stellar contract invoke \
   -- initialize \
   --admin <DIRECCIÓN_PÚBLICA_DEL_ADMIN>
 
-# Actualizar CONTRACT_ID en apps/api/.env (local) y en Railway (producción)
+# Actualizar CENSO_CONTRACT_ID en apps/api/.env (local) y en Railway (producción)
 ```
 
 Ver el contrato en el explorador de Stellar:
