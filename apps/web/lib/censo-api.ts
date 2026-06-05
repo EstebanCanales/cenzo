@@ -34,6 +34,34 @@ export type LoteSummary = {
   mint_tx_hash: string | null;
 };
 
+export type ActorKind = "finca" | "tostador" | "vendedor" | "admin";
+
+export type Actor = {
+  id: string;
+  kind: ActorKind;
+  name: string;
+  email: string | null;
+  allowed_stages: string[];
+};
+
+export const ROLE_LABEL: Record<string, string> = {
+  finca: "Finca",
+  tostador: "Tostador",
+  vendedor: "Vendedor",
+  admin: "Admin",
+};
+
+export const ROLE_DESC: Record<string, string> = {
+  finca: "Origina el lote y registra siembra, fertilización, riego y cosecha.",
+  tostador: "Registra recepción, tueste y empaque.",
+  vendedor: "Registra calidad y venta.",
+};
+
+/** ¿Este rol puede originar (mintear) lotes? */
+export function canMint(kind: string): boolean {
+  return kind === "finca" || kind === "admin";
+}
+
 export const CENSO_API_URL = process.env.CENSO_API_URL ?? "http://127.0.0.1:4000";
 export const STELLAR_NETWORK = process.env.STELLAR_NETWORK ?? "testnet";
 

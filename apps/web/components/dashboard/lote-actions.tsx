@@ -11,12 +11,20 @@ import { addEvent, setCertification } from "@/lib/censo-actions";
 
 const TIERS = ["Plata", "Oro", "Diamante"] as const;
 
-export function LoteActions({ loteId }: { loteId: number }) {
+export function LoteActions({
+  loteId,
+  allowedStages,
+  roleLabel,
+}: {
+  loteId: number;
+  allowedStages: string[];
+  roleLabel: string;
+}) {
   const router = useRouter();
+  const isAdmin = allowedStages.length === 0; // admin = sin restricción
 
   // --- Agregar evento ---
-  const [stage, setStage] = useState("");
-  const [actor, setActor] = useState("");
+  const [stage, setStage] = useState(allowedStages[0] ?? "");
   const [payload, setPayload] = useState('{\n  "detalle": ""\n}');
   const [eventLoading, setEventLoading] = useState(false);
   const [eventError, setEventError] = useState<string | null>(null);
@@ -34,9 +42,7 @@ export function LoteActions({ loteId }: { loteId: number }) {
       return;
     }
     try {
-      await addEvent(loteId, { stage: stage.trim(), actor: actor.trim(), payload: parsed });
-      setStage("");
-      setActor("");
+      await addEvent(loteId, { stage: stage.trim(), payload: parsed });
       setPayload('{\n  "detalle": ""\n}');
       router.refresh();
     } catch (err) {
@@ -68,26 +74,36 @@ export function LoteActions({ loteId }: { loteId: number }) {
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <form onSubmit={submitEvent} className="censo-card" style={{ display: "grid", gap: 12 }}>
-        <strong style={{ fontSize: 15 }}>Anclar evento on-chain</strong>
-        <div style={{ display: "grid", gap: 6 }}>
-          <Label htmlFor="stage">Etapa (símbolo)</Label>
-          <Input
-            id="stage"
-            value={stage}
-            onChange={(e) => setStage(e.target.value)}
-            placeholder="siembra / fertiliz / tueste / venta"
-            required
-          />
+        <div style={{ display: "grid", gap: 2 }}>
+          <strong style={{ fontSize: 15 }}>Anclar evento on-chain</strong>
+          <span style={{ color: "var(--muted)", fontSize: 12 }}>
+            Actuando como <strong>{roleLabel}</strong>
+          </span>
         </div>
         <div style={{ display: "grid", gap: 6 }}>
-          <Label htmlFor="actor">Actor</Label>
-          <Input
-            id="actor"
-            value={actor}
-            onChange={(e) => setActor(e.target.value)}
-            placeholder="finca:santa_lucia"
-            required
-          />
+          <Label htmlFor="stage">Etapa</Label>
+          {isAdmin ? (
+            <Input
+              id="stage"
+              value={stage}
+              onChange={(e) => setStage(e.target.value)}
+              placeholder="etapa (símbolo)"
+              required
+            />
+          ) : (
+            <select
+              id="stage"
+              className="ui-input"
+              value={stage}
+              onChange={(e) => setStage(e.target.value)}
+            >
+              {allowedStages.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div style={{ display: "grid", gap: 6 }}>
           <Label htmlFor="payload">Payload (JSON, se hashea y ancla)</Label>

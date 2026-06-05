@@ -12,14 +12,32 @@ pub struct CreateLoteReq {
 #[derive(Deserialize)]
 pub struct AddEventReq {
     pub stage: String,
-    pub actor: String,
     pub payload: Value,
+    // El actor se deriva del rol autenticado (x-actor-email), no del request.
 }
 
 #[derive(Deserialize)]
 pub struct SetCertReq {
     /// "Plata" | "Oro" | "Diamante"
     pub tier: String,
+}
+
+#[derive(Deserialize)]
+pub struct CreateActorReq {
+    /// "finca" | "tostador" | "vendedor" | "admin"
+    pub kind: String,
+    pub name: String,
+    pub email: String,
+}
+
+#[derive(Serialize)]
+pub struct ActorView {
+    pub id: String,
+    pub kind: String,
+    pub name: String,
+    pub email: Option<String>,
+    /// Etapas que este rol puede registrar (vacío en admin = todas).
+    pub allowed_stages: Vec<String>,
 }
 
 // ---- Responses ----

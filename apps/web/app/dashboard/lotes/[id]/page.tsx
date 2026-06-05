@@ -2,11 +2,13 @@ import { ExternalLink, ShieldAlert, ShieldCheck, ShieldQuestion } from "lucide-r
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActorOnboarding } from "@/components/dashboard/actor-onboarding";
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { LoteActions } from "@/components/dashboard/lote-actions";
 import { LoteQr } from "@/components/dashboard/lote-qr";
 import { Badge } from "@/components/ui/badge";
-import { explorerTx, getLote, type EventView } from "@/lib/censo-api";
+import { explorerTx, getLote, ROLE_LABEL, type EventView } from "@/lib/censo-api";
+import { getCurrentActor } from "@/lib/censo-server";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +66,7 @@ export default async function LoteDetailPage({
   if (!lote) {
     notFound();
   }
+  const actor = await getCurrentActor();
 
   return (
     <LabShell
@@ -139,7 +142,15 @@ export default async function LoteDetailPage({
 
         <aside style={{ display: "grid", gap: 16 }}>
           <LoteQr loteId={lote.id} />
-          <LoteActions loteId={lote.id} />
+          {actor ? (
+            <LoteActions
+              loteId={lote.id}
+              allowedStages={actor.allowed_stages}
+              roleLabel={ROLE_LABEL[actor.kind]}
+            />
+          ) : (
+            <ActorOnboarding />
+          )}
         </aside>
       </div>
     </LabShell>

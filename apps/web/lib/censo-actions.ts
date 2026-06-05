@@ -3,26 +3,33 @@
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/auth";
-import { CENSO_API_URL } from "@/lib/censo-api";
+import { type Actor, CENSO_API_URL } from "@/lib/censo-api";
 
-async function requireSession() {
+async function sessionEmail(): Promise<string> {
   const session = await auth();
-  if (!session) {
+  const email = session?.user?.email;
+  if (!email) {
     throw new Error("No autenticado");
   }
+  return email;
 }
 
-function writeHeaders(): HeadersInit {
+function apiKey(): string {
+  return process.env.CENSO_API_SECRET ?? "";
+}
+
+async function authHeaders(): Promise<HeadersInit> {
   return {
     "content-type": "application/json",
-    "x-api-key": process.env.CENSO_API_SECRET ?? "",
+    "x-api-key": apiKey(),
+    "x-actor-email": await sessionEmail(),
   };
 }
 
-async function post(path: string, body: unknown) {
+async function post(path: string, body: unknown, headers: HeadersInit) {
   const res = await fetch(`${CENSO_API_URL}${path}`, {
     method: "POST",
-    headers: writeHeaders(),
+    headers,
     body: JSON.stringify(body),
     cache: "no-store",
   });
@@ -33,24 +40,38 @@ async function post(path: string, body: unknown) {
   return res.json();
 }
 
+export async function registerActor(input: { kind: string; name?: string }): Promise<Actor> {
+  const session = await auth();
+  const email = session?.user?.email;
+  if (!email) {
+    throw new Error("No autenticado");
+  }
+  const name = input.name?.trim() || session.user?.name || email;
+  const result = await post(
+    "/actors",
+    { kind: input.kind, name, email },
+    { "content-type": "application/json", "x-api-key": apiKey() },
+  );
+  revalidatePath("/dashboard/lotes");
+  return result;
+}
+
 export type CreateLoteResult = { id: number; mint_tx_hash: string | null };
 
 export async function createLote(input: {
   producer: string;
   metadata_uri?: string;
 }): Promise<CreateLoteResult> {
-  await requireSession();
-  const result = await post("/lotes", input);
+  const result = await post("/lotes", input, await authHeaders());
   revalidatePath("/dashboard/lotes");
   return result;
 }
 
 export async function addEvent(
   loteId: number,
-  input: { stage: string; actor: string; payload: Record<string, unknown> },
+  input: { stage: string; payload: Record<string, unknown> },
 ): Promise<{ idx: number; hash: string; onchain_tx_hash: string | null }> {
-  await requireSession();
-  const result = await post(`/lotes/${loteId}/events`, input);
+  const result = await post(`/lotes/${loteId}/events`, input, await authHeaders());
   revalidatePath(`/dashboard/lotes/${loteId}`);
   return result;
 }
@@ -59,8 +80,7 @@ export async function setCertification(
   loteId: number,
   tier: string,
 ): Promise<{ ok: boolean; tx_hash: string | null }> {
-  await requireSession();
-  const result = await post(`/lotes/${loteId}/certification`, { tier });
+  const result = await post(`/lotes/${loteId}/certification`, { tier }, await authHeaders());
   revalidatePath(`/dashboard/lotes/${loteId}`);
   return result;
 }

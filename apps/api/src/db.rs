@@ -14,6 +14,14 @@ pub struct LoteRow {
 }
 
 #[derive(sqlx::FromRow)]
+pub struct ActorRow {
+    pub id: String,
+    pub kind: String,
+    pub name: String,
+    pub email: Option<String>,
+}
+
+#[derive(sqlx::FromRow)]
 pub struct EventRow {
     pub idx: i64,
     pub stage: String,
@@ -142,6 +150,43 @@ pub async fn update_tier(db: &Db, lote_id: i64, tier: &str) -> Result<(), sqlx::
         .bind(lote_id)
         .execute(db)
         .await?;
+    Ok(())
+}
+
+// ---- Actores ----
+
+pub async fn get_actor_by_email(db: &Db, email: &str) -> Result<Option<ActorRow>, sqlx::Error> {
+    sqlx::query_as::<_, ActorRow>(
+        "select id, kind, name, email from actors where email = ? limit 1",
+    )
+    .bind(email)
+    .fetch_optional(db)
+    .await
+}
+
+pub async fn list_actors(db: &Db) -> Result<Vec<ActorRow>, sqlx::Error> {
+    sqlx::query_as::<_, ActorRow>("select id, kind, name, email from actors order by kind, name")
+        .fetch_all(db)
+        .await
+}
+
+pub async fn upsert_actor(
+    db: &Db,
+    id: &str,
+    kind: &str,
+    name: &str,
+    email: Option<&str>,
+) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        "insert into actors (id, kind, name, email) values (?, ?, ?, ?)
+         on conflict(id) do update set kind = excluded.kind, name = excluded.name",
+    )
+    .bind(id)
+    .bind(kind)
+    .bind(name)
+    .bind(email)
+    .execute(db)
+    .await?;
     Ok(())
 }
 

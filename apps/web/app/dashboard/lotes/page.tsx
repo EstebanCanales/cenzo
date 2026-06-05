@@ -1,10 +1,12 @@
 import { ChevronRight, PackageSearch, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
+import { ActorOnboarding } from "@/components/dashboard/actor-onboarding";
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { LoteCreateForm } from "@/components/dashboard/lote-create-form";
 import { Badge } from "@/components/ui/badge";
-import { listLotes, type LoteSummary } from "@/lib/censo-api";
+import { canMint, listLotes, ROLE_LABEL, type LoteSummary } from "@/lib/censo-api";
+import { getCurrentActor } from "@/lib/censo-server";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +31,16 @@ export default async function LotesPage() {
   } catch (e) {
     error = e instanceof Error ? e.message : "No se pudo conectar al backend";
   }
+  const actor = await getCurrentActor();
 
   return (
     <LabShell
       eyebrow="On-chain"
       heading="Lotes en Stellar"
       description="Cada lote es un NFT en Soroban (testnet) que acumula su trazabilidad y su certificación. Mintea, ancla eventos y verifica de forma inmutable."
+      actions={
+        actor ? <Badge variant="green">Actuando como {ROLE_LABEL[actor.kind]}</Badge> : null
+      }
     >
       <div className="censo-grid">
         <section className="censo-list">
@@ -76,7 +82,19 @@ export default async function LotesPage() {
         </section>
 
         <aside>
-          <LoteCreateForm />
+          {!actor ? (
+            <ActorOnboarding />
+          ) : canMint(actor.kind) ? (
+            <LoteCreateForm />
+          ) : (
+            <div className="censo-card" style={{ display: "grid", gap: 6 }}>
+              <strong style={{ fontSize: 15 }}>Rol {ROLE_LABEL[actor.kind]}</strong>
+              <span style={{ color: "var(--muted)", fontSize: 13 }}>
+                Tu rol no origina lotes. Abrí un lote existente para registrar tus etapas
+                ({actor.allowed_stages.join(", ")}).
+              </span>
+            </div>
+          )}
         </aside>
       </div>
     </LabShell>

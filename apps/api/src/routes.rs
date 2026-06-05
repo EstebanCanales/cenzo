@@ -10,10 +10,11 @@ use serde_json::{json, Value};
 
 use crate::auth::check_api_key;
 use crate::config::Config;
-use crate::db::{self, Db};
+use crate::db::{self, ActorRow, Db};
 use crate::error::AppError;
 use crate::hashing::{canonical_json, sha256_hex};
 use crate::models::*;
+use crate::roles;
 use crate::stellar::Stellar;
 
 #[derive(Clone)]
@@ -26,6 +27,8 @@ pub struct AppState {
 pub fn router(state: AppState) -> Router {
     Router::new()
         .route("/health", get(health))
+        .route("/actors", get(list_actors).post(create_actor))
+        .route("/actors/me", get(get_me))
         .route("/lotes", get(list_lotes).post(create_lote))
         .route("/lotes/:id", get(get_lote))
         .route("/lotes/:id/events", post(add_event))
@@ -36,6 +39,83 @@ pub fn router(state: AppState) -> Router {
 
 async fn health() -> Json<Value> {
     Json(json!({ "status": "ok", "service": "censo-api" }))
+}
+
+// ---- Actores / roles ----
+
+fn actor_email(headers: &HeaderMap) -> Option<String> {
+    headers
+        .get("x-actor-email")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.trim().to_lowercase())
+        .filter(|s| !s.is_empty())
+}
+
+/// Resuelve el actor que actúa (header `x-actor-email`); error si no existe.
+async fn acting_actor(st: &AppState, headers: &HeaderMap) -> Result<ActorRow, AppError> {
+    let email = actor_email(headers)
+        .ok_or_else(|| AppError::BadRequest("falta x-actor-email".into()))?;
+    db::get_actor_by_email(&st.db, &email)
+        .await?
+        .ok_or_else(|| AppError::Forbidden("registrate como actor primero".into()))
+}
+
+fn actor_view(a: ActorRow) -> ActorView {
+    let stages = roles::allowed_stages(&a.kind)
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    ActorView {
+        id: a.id,
+        kind: a.kind,
+        name: a.name,
+        email: a.email,
+        allowed_stages: stages,
+    }
+}
+
+async fn list_actors(
+    State(st): State<AppState>,
+    headers: HeaderMap,
+) -> Result<Json<Vec<ActorView>>, AppError> {
+    check_api_key(&headers, &st.config.api_shared_secret)?;
+    let rows = db::list_actors(&st.db).await?;
+    Ok(Json(rows.into_iter().map(actor_view).collect()))
+}
+
+async fn create_actor(
+    State(st): State<AppState>,
+    headers: HeaderMap,
+    Json(req): Json<CreateActorReq>,
+) -> Result<Json<ActorView>, AppError> {
+    check_api_key(&headers, &st.config.api_shared_secret)?;
+    if !roles::is_role(&req.kind) {
+        return Err(AppError::BadRequest(
+            "rol inválido (finca|tostador|vendedor|admin)".into(),
+        ));
+    }
+    if req.name.trim().is_empty() || req.email.trim().is_empty() {
+        return Err(AppError::BadRequest("name y email requeridos".into()));
+    }
+    let id = req.email.trim().to_lowercase();
+    db::upsert_actor(&st.db, &id, &req.kind, req.name.trim(), Some(&id)).await?;
+    let row = db::get_actor_by_email(&st.db, &id)
+        .await?
+        .ok_or_else(|| AppError::Internal(anyhow::anyhow!("actor no encontrado tras crear")))?;
+    Ok(Json(actor_view(row)))
+}
+
+async fn get_me(
+    State(st): State<AppState>,
+    headers: HeaderMap,
+) -> Result<Json<ActorView>, AppError> {
+    check_api_key(&headers, &st.config.api_shared_secret)?;
+    let email = actor_email(&headers)
+        .ok_or_else(|| AppError::BadRequest("falta x-actor-email".into()))?;
+    let actor = db::get_actor_by_email(&st.db, &email)
+        .await?
+        .ok_or_else(|| AppError::NotFound("sin actor registrado".into()))?;
+    Ok(Json(actor_view(actor)))
 }
 
 async fn list_lotes(State(st): State<AppState>) -> Result<Json<Vec<LoteSummary>>, AppError> {
@@ -59,6 +139,13 @@ async fn create_lote(
     Json(req): Json<CreateLoteReq>,
 ) -> Result<Json<CreateLoteResp>, AppError> {
     check_api_key(&headers, &st.config.api_shared_secret)?;
+    let actor = acting_actor(&st, &headers).await?;
+    if !roles::can_mint(&actor.kind) {
+        return Err(AppError::Forbidden(format!(
+            "el rol '{}' no puede originar lotes (solo finca o admin)",
+            actor.kind
+        )));
+    }
     if req.producer.trim().is_empty() {
         return Err(AppError::BadRequest("producer requerido".into()));
     }
@@ -80,18 +167,27 @@ async fn add_event(
     Json(req): Json<AddEventReq>,
 ) -> Result<Json<AddEventResp>, AppError> {
     check_api_key(&headers, &st.config.api_shared_secret)?;
+    let actor = acting_actor(&st, &headers).await?;
 
     if db::get_lote(&st.db, id).await?.is_none() {
         return Err(AppError::NotFound(format!("lote {id} no existe")));
     }
     validate_symbol(&req.stage)?;
+    if !roles::stage_allowed(&actor.kind, &req.stage) {
+        return Err(AppError::Forbidden(format!(
+            "la etapa '{}' no corresponde al rol '{}'",
+            req.stage, actor.kind
+        )));
+    }
 
+    // El actor on-chain se deriva del rol autenticado, no del request.
+    let actor_id = format!("{}:{}", actor.kind, actor.name);
     let canonical = canonical_json(&req.payload);
     let hash = sha256_hex(&canonical);
 
     let (idx, tx) = st
         .stellar
-        .append_event(id, &req.stage, &req.actor, &hash)
+        .append_event(id, &req.stage, &actor_id, &hash)
         .await?;
 
     db::insert_event(
@@ -99,7 +195,7 @@ async fn add_event(
         id,
         idx,
         &req.stage,
-        &req.actor,
+        &actor_id,
         &canonical,
         &hash,
         tx.as_deref(),

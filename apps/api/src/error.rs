@@ -10,6 +10,7 @@ pub enum AppError {
     NotFound(String),
     BadRequest(String),
     Unauthorized,
+    Forbidden(String),
     Internal(anyhow::Error),
 }
 
@@ -19,6 +20,7 @@ impl IntoResponse for AppError {
             AppError::NotFound(m) => (StatusCode::NOT_FOUND, m),
             AppError::BadRequest(m) => (StatusCode::BAD_REQUEST, m),
             AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "no autorizado".to_string()),
+            AppError::Forbidden(m) => (StatusCode::FORBIDDEN, m),
             AppError::Internal(e) => {
                 eprintln!("[censo-api] error interno: {e:?}");
                 (StatusCode::INTERNAL_SERVER_ERROR, "error interno".to_string())

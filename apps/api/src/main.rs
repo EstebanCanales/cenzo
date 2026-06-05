@@ -4,6 +4,7 @@ mod db;
 mod error;
 mod hashing;
 mod models;
+mod roles;
 mod routes;
 mod stellar;
 
