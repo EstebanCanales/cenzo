@@ -68,9 +68,17 @@ El NFT del lote lleva la imagen del certificado generada dinámicamente — úni
 
 `Next.js 15` · `Rust + Axum` · `Soroban Smart Contract` · `Stellar Testnet` · `SQLite` · `NASA POWER API` · `Freighter Wallet`
 
-→ [Documentación técnica completa](docs/TECHNICAL.md)
-
 ---
+
+## Documentación
+
+| Documento | Contenido |
+|-----------|-----------|
+| [TECHNICAL.md](docs/TECHNICAL.md) | Arquitectura, stack completo y estructura del repo |
+| [API.md](docs/API.md) | Referencia completa de la API REST con ejemplos |
+| [CONTRACT.md](docs/CONTRACT.md) | Contrato Soroban: funciones, flujo de verificación y tests |
+| [DATABASE.md](docs/DATABASE.md) | Esquema SQLite, tablas y migraciones |
+| [SETUP.md](docs/SETUP.md) | Setup local, despliegue y variables de entorno |
 
 ---
 
