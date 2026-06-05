@@ -1,14 +1,20 @@
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { MotionFade } from "@/components/dashboard/motion-fade";
 import { MetricCard } from "@/components/dashboard/metric-card";
+import { SensorPanel } from "@/components/dashboard/sensor-panel";
 import { StellarContractFlowClient } from "@/components/dashboard/stellar-contract-flow-client";
 import { auth } from "@/auth";
 import { dashboardInsights, dashboardMetrics, getGreetingByDate } from "@/lib/dashboard";
+import { getClimate, listSensorReadings } from "@/lib/censo-api";
 
 export default async function DashboardPage() {
   const session = await auth();
   const user = session?.user?.name ?? "Operator";
   const greeting = getGreetingByDate(new Date());
+  const [readings, climate] = await Promise.all([
+    listSensorReadings(),
+    getClimate(9.9281, -84.0907, 7),
+  ]);
 
   return (
     <LabShell
@@ -48,6 +54,10 @@ export default async function DashboardPage() {
 
       <MotionFade delay={0.08} className="overview-full">
         <StellarContractFlowClient />
+      </MotionFade>
+
+      <MotionFade delay={0.12} className="overview-full">
+        <SensorPanel readings={readings} climate={climate} />
       </MotionFade>
     </LabShell>
   );

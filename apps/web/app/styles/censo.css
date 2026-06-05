@@ -357,3 +357,128 @@
   border-top: 1px solid var(--line, #f0f0f0);
   padding-top: 18px;
 }
+
+/* ── Sensores / Clima (Fase 5) ─────────────────────────────────── */
+
+.sensor-panel {
+  display: grid;
+  gap: 20px;
+}
+
+.sensor-panel__section {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--line, #f0f0f0);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.sensor-reading-card {
+  background: var(--surface, #f9f9f7);
+  border: 1px solid var(--line, #ebebeb);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.sensor-reading-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.sensor-station {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: var(--accent, #1a7a4a);
+}
+
+.sensor-time {
+  font-size: 11px;
+  color: var(--muted, #888);
+}
+
+.sensor-reading-card__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sensor-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 52px;
+}
+
+.sensor-metric svg {
+  color: var(--muted, #888);
+}
+
+.sensor-metric span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sensor-metric small {
+  font-size: 10px;
+  color: var(--muted, #888);
+}
+
+.sensor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.sensor-th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted, #888);
+  padding: 4px 8px 6px;
+  border-bottom: 1px solid var(--line, #ebebeb);
+}
+
+.sensor-th--num,
+.sensor-td--num {
+  text-align: right;
+}
+
+.sensor-td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--line, #f5f5f5);
+  color: var(--text, #111);
+}
+
+.sensor-td:first-child {
+  font-family: var(--font-mono, monospace);
+}
+
+.btn-sensor-sim {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--accent, #1a7a4a);
+  color: var(--accent, #1a7a4a);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-sensor-sim:hover:not(:disabled) {
+  background: var(--accent, #1a7a4a);
+  color: #fff;
+}
+
+.btn-sensor-sim:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

@@ -64,8 +64,8 @@ pub async fn connect(database_url: &str) -> anyhow::Result<Db> {
 
 /// Aplica el esquema (idempotente, `if not exists`).
 pub async fn init_schema(db: &Db) -> anyhow::Result<()> {
-    let schema = include_str!("../migrations/0001_init.sql");
-    sqlx::raw_sql(schema).execute(db).await?;
+    sqlx::raw_sql(include_str!("../migrations/0001_init.sql")).execute(db).await?;
+    sqlx::raw_sql(include_str!("../migrations/0002_sensors.sql")).execute(db).await?;
     Ok(())
 }
 
@@ -203,4 +203,58 @@ pub async fn insert_certification(
         .execute(db)
         .await?;
     Ok(())
+}
+
+// ---- Sensores ----
+
+use crate::sensors::{SensorReading, SensorReadingView};
+
+pub async fn insert_sensor_reading(db: &Db, r: &SensorReading) -> Result<i64, sqlx::Error> {
+    let id = sqlx::query_scalar::<_, i64>(
+        "insert into sensor_readings
+           (station_id, lote_id, temp_aire, humedad, temp_suelo, ph_suelo, lluvia_mm, lat, lon)
+         values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         returning id",
+    )
+    .bind(&r.station_id)
+    .bind(r.lote_id)
+    .bind(r.temp_aire)
+    .bind(r.humedad)
+    .bind(r.temp_suelo)
+    .bind(r.ph_suelo)
+    .bind(r.lluvia_mm)
+    .bind(r.lat)
+    .bind(r.lon)
+    .fetch_one(db)
+    .await?;
+    Ok(id)
+}
+
+pub async fn list_sensor_readings(
+    db: &Db,
+    lote_id: Option<i64>,
+    limit: i64,
+) -> Result<Vec<SensorReadingView>, sqlx::Error> {
+    if let Some(lid) = lote_id {
+        sqlx::query_as::<_, SensorReadingView>(
+            "select id, station_id, lote_id, temp_aire, humedad, temp_suelo, ph_suelo,
+                    lluvia_mm, lat, lon, recorded_at
+             from sensor_readings where lote_id = ?
+             order by recorded_at desc limit ?",
+        )
+        .bind(lid)
+        .bind(limit)
+        .fetch_all(db)
+        .await
+    } else {
+        sqlx::query_as::<_, SensorReadingView>(
+            "select id, station_id, lote_id, temp_aire, humedad, temp_suelo, ph_suelo,
+                    lluvia_mm, lat, lon, recorded_at
+             from sensor_readings
+             order by recorded_at desc limit ?",
+        )
+        .bind(limit)
+        .fetch_all(db)
+        .await
+    }
 }

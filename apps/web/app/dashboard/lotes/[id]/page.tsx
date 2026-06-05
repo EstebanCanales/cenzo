@@ -7,8 +7,9 @@ import { LabShell } from "@/components/dashboard/lab-shell";
 import { LoteActions } from "@/components/dashboard/lote-actions";
 import { LoteEvaluation } from "@/components/dashboard/lote-evaluation";
 import { LoteQr } from "@/components/dashboard/lote-qr";
+import { SensorPanel } from "@/components/dashboard/sensor-panel";
 import { Badge } from "@/components/ui/badge";
-import { explorerTx, getLote, ROLE_LABEL, type EventView } from "@/lib/censo-api";
+import { explorerTx, getClimate, getLote, listSensorReadings, ROLE_LABEL, type EventView } from "@/lib/censo-api";
 import { getCurrentActor } from "@/lib/censo-server";
 
 export const dynamic = "force-dynamic";
@@ -63,11 +64,15 @@ export default async function LoteDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const lote = await getLote(id);
+  const [lote, actor, readings, climate] = await Promise.all([
+    getLote(id),
+    getCurrentActor(),
+    listSensorReadings(Number(id)),
+    getClimate(9.9281, -84.0907, 7),  // coordenadas demo Costa Rica central
+  ]);
   if (!lote) {
     notFound();
   }
-  const actor = await getCurrentActor();
 
   return (
     <LabShell
@@ -157,6 +162,7 @@ export default async function LoteDetailPage({
           ) : (
             <ActorOnboarding />
           )}
+          <SensorPanel readings={readings} climate={climate} loteId={lote.id} />
         </aside>
       </div>
     </LabShell>

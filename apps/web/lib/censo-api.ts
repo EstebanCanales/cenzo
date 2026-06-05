@@ -109,3 +109,54 @@ export async function getPublicLote(id: number | string): Promise<LoteView | nul
   if (!res.ok) throw new Error(`getPublicLote falló: ${res.status}`);
   return res.json();
 }
+
+// ── Sensores / Clima (Fase 5) ─────────────────────────────────────────────
+
+export type SensorReading = {
+  id: number;
+  station_id: string;
+  lote_id: number | null;
+  temp_aire: number | null;
+  humedad: number | null;
+  temp_suelo: number | null;
+  ph_suelo: number | null;
+  lluvia_mm: number | null;
+  lat: number | null;
+  lon: number | null;
+  recorded_at: string;
+};
+
+export type NasaDay = {
+  date: string;         // YYYYMMDD
+  t2m_max: number;
+  t2m_min: number;
+  prectotcorr: number;
+  rh2m: number;
+};
+
+export type ClimateData = {
+  lat: number;
+  lon: number;
+  days: NasaDay[];
+};
+
+export async function listSensorReadings(loteId?: number): Promise<SensorReading[]> {
+  const qs = loteId ? `?lote_id=${loteId}&limit=20` : "?limit=20";
+  const res = await fetch(`${CENSO_API_URL}/sensors/readings${qs}`, { cache: "no-store" });
+  if (!res.ok) return [];
+  const json = await res.json();
+  return json.readings ?? [];
+}
+
+export async function getClimate(lat: number, lon: number, days = 7): Promise<ClimateData | null> {
+  try {
+    const res = await fetch(
+      `${CENSO_API_URL}/sensors/climate/${lat}/${lon}?days=${days}`,
+      { next: { revalidate: 3600 } }  // cache 1h — NASA POWER no cambia en minutos
+    );
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}

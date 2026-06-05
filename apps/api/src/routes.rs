@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::HeaderMap,
     routing::{get, post},
     Json, Router,
 };
+use serde::Deserialize;
 use serde_json::{json, Value};
 
 use crate::auth::check_api_key;
@@ -16,6 +17,7 @@ use crate::error::AppError;
 use crate::hashing::{canonical_json, sha256_hex};
 use crate::models::*;
 use crate::roles;
+use crate::sensors;
 use crate::stellar::Stellar;
 
 #[derive(Clone)]
@@ -36,6 +38,10 @@ pub fn router(state: AppState) -> Router {
         .route("/lotes/:id/certification", post(set_cert))
         .route("/lotes/:id/certify", post(certify))
         .route("/public/lotes/:id", get(get_lote))
+        // Sensores IoT + clima NASA POWER
+        .route("/sensors/readings", get(list_readings).post(add_reading))
+        .route("/sensors/simulate", post(simulate_reading))
+        .route("/sensors/climate/:lat/:lon", get(get_climate))
         .with_state(state)
 }
 
@@ -356,4 +362,68 @@ fn validate_symbol(s: &str) -> Result<(), AppError> {
         ));
     }
     Ok(())
+}
+
+// ── Sensores ──────────────────────────────────────────────────────────────
+
+#[derive(Deserialize)]
+struct ReadingsQuery {
+    lote_id: Option<i64>,
+    limit: Option<i64>,
+}
+
+async fn list_readings(
+    State(state): State<AppState>,
+    Query(q): Query<ReadingsQuery>,
+) -> Result<Json<Value>, AppError> {
+    let limit = q.limit.unwrap_or(50).min(200);
+    let rows = db::list_sensor_readings(&state.db, q.lote_id, limit).await?;
+    Ok(Json(json!({ "readings": rows })))
+}
+
+async fn add_reading(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<sensors::SensorReading>,
+) -> Result<Json<Value>, AppError> {
+    check_api_key(&headers, &state.config.api_shared_secret)?;
+    let id = db::insert_sensor_reading(&state.db, &body).await?;
+    Ok(Json(json!({ "id": id })))
+}
+
+#[derive(Deserialize)]
+struct SimulateBody {
+    station_id: Option<String>,
+    lote_id: Option<i64>,
+}
+
+async fn simulate_reading(
+    State(state): State<AppState>,
+    Json(body): Json<SimulateBody>,
+) -> Result<Json<Value>, AppError> {
+    let station = body.station_id.as_deref().unwrap_or("sim-finca-01");
+    let reading = sensors::simulate_readings(station, body.lote_id);
+    let id = db::insert_sensor_reading(&state.db, &reading).await?;
+    Ok(Json(json!({ "id": id, "reading": reading })))
+}
+
+#[derive(Deserialize)]
+struct ClimatePath {
+    lat: f64,
+    lon: f64,
+}
+
+#[derive(Deserialize)]
+struct ClimateQuery {
+    days: Option<u8>,
+}
+
+async fn get_climate(
+    Path(p): Path<(f64, f64)>,
+    Query(q): Query<ClimateQuery>,
+) -> Result<Json<Value>, AppError> {
+    let (lat, lon) = p;
+    let days = q.days.unwrap_or(7).min(30);
+    let climate = sensors::fetch_nasa_climate(lat, lon, days).await?;
+    Ok(Json(serde_json::to_value(climate).unwrap()))
 }

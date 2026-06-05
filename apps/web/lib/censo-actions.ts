@@ -93,3 +93,18 @@ export async function certify(
   revalidatePath(`/dashboard/lotes/${loteId}`);
   return result;
 }
+
+/** Genera lectura IoT simulada y la guarda (demo / testing). */
+export async function simulateSensorReading(
+  stationId: string,
+  loteId?: number,
+): Promise<{ id: number; reading: Record<string, unknown> }> {
+  const result = await post(
+    "/sensors/simulate",
+    { station_id: stationId, lote_id: loteId ?? null },
+    await authHeaders(),
+  );
+  revalidatePath("/dashboard");
+  if (loteId) revalidatePath(`/dashboard/lotes/${loteId}`);
+  return result;
+}

@@ -7,6 +7,7 @@ mod hashing;
 mod models;
 mod roles;
 mod routes;
+mod sensors;
 mod stellar;
 
 use std::sync::Arc;
