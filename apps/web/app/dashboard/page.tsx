@@ -1,9 +1,7 @@
-import { EvidencePanel } from "@/components/dashboard/evidence-panel";
 import { LabShell } from "@/components/dashboard/lab-shell";
 import { MotionFade } from "@/components/dashboard/motion-fade";
 import { MetricCard } from "@/components/dashboard/metric-card";
-import { TrendChart } from "@/components/dashboard/trend-chart";
-import { VerificationMatrix } from "@/components/dashboard/verification-matrix";
+import { StellarContractFlowClient } from "@/components/dashboard/stellar-contract-flow-client";
 import { auth } from "@/auth";
 import { dashboardInsights, dashboardMetrics, getGreetingByDate } from "@/lib/dashboard";
 
@@ -16,7 +14,8 @@ export default async function DashboardPage() {
     <LabShell
       description="Visibilidad clara sobre lotes, validaciones y calidad a medida que el producto avanza."
       eyebrow="Overview"
-      heading="Agro Tech Lab"
+      heading={`${greeting}, ${user}.`}
+      hideHeader
       variant="overview"
     >
       <section className="command-surface">
@@ -35,6 +34,7 @@ export default async function DashboardPage() {
           <span>{dashboardInsights.sensorSignal.title}</span>
           <strong>{dashboardInsights.sensorSignal.value}</strong>
           <p>{dashboardInsights.sensorSignal.label}</p>
+          <div className="command-surface__live">Live signal</div>
         </MotionFade>
       </section>
 
@@ -46,19 +46,9 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <section className="overview-lab-grid">
-        <MotionFade delay={0.08}>
-          <EvidencePanel />
-        </MotionFade>
-        <div className="overview-lab-grid__charts">
-          <MotionFade delay={0.12}>
-            <TrendChart compact />
-          </MotionFade>
-          <MotionFade delay={0.16}>
-            <VerificationMatrix compact />
-          </MotionFade>
-        </div>
-      </section>
+      <MotionFade delay={0.08} className="overview-full">
+        <StellarContractFlowClient />
+      </MotionFade>
     </LabShell>
   );
 }

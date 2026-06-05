@@ -1,12 +1,26 @@
-import { Check, Clock3, TriangleAlert } from "lucide-react";
+"use client";
 
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { verificationMatrix } from "@/lib/dashboard";
 
-const statusIcon = {
-  verified: Check,
-  pending: Clock3,
-  review: TriangleAlert,
-};
+const cropColors = ["#1a7a4a", "#c98b24", "#5f8192"] as const;
+
+const chartConfig = Object.fromEntries(
+  verificationMatrix.rows.map((row, i) => [
+    row.label,
+    { label: row.label, color: cropColors[i % cropColors.length] },
+  ])
+);
 
 type VerificationMatrixProps = {
   compact?: boolean;
@@ -14,53 +28,65 @@ type VerificationMatrixProps = {
 };
 
 export function VerificationMatrix({ compact = false, detailed = false }: VerificationMatrixProps) {
-  const stages = verificationMatrix.rows[0]?.cells.map((cell) => cell.stage) ?? [];
+  const stages = verificationMatrix.rows[0]?.cells.map((c) => c.stage) ?? [];
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+
+  const data = stages.map((stage) => {
+    const row: Record<string, string | number> = { stage };
+    for (const crop of verificationMatrix.rows) {
+      const cell = crop.cells.find((c) => c.stage === stage);
+      if (cell) row[crop.label] = cell.count;
+    }
+    return row;
+  });
+
+  const crops = verificationMatrix.rows.map((r) => r.label);
 
   return (
-    <section className={`lab-chart matrix-panel ${compact ? "matrix-panel--compact" : ""}`}>
-      <div className="lab-chart__header">
+    <section ref={ref} className={`lab-chart lab-chart--flex matrix-panel ${compact ? "matrix-panel--compact" : ""}`}>
+      <div className="lab-chart__header matrix-panel__header">
         <div>
           <p className="lab-kicker">Matrix</p>
           <h2>Stage verification</h2>
+          {detailed ? (
+            <p className="lab-chart__lede">Cross-check crop readiness against each operational stage.</p>
+          ) : null}
         </div>
         <span>By crop</span>
       </div>
-      <div className="verification-matrix">
-        {detailed ? (
-          <div className="verification-matrix__stage-row" aria-hidden="true">
-            <span />
-            <div>
-              {stages.map((stage) => (
-                <small key={stage}>{stage}</small>
-              ))}
-            </div>
-          </div>
-        ) : null}
-        {verificationMatrix.rows.map((row) => (
-          <div key={row.label} className="verification-matrix__row">
-            <strong>{row.label}</strong>
-            <div className="verification-matrix__cells">
-              {row.cells.map((cell) => {
-                const Icon = statusIcon[cell.status];
-                return (
-                  <span key={`${row.label}-${cell.stage}`} className={`matrix-cell matrix-cell--${cell.status}`}>
-                    <Icon size={14} />
-                    <strong>{cell.count}</strong>
-                    {detailed ? <small>{cell.stage}</small> : null}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-      {detailed ? (
-        <div className="matrix-panel__legend">
-          <span><Check size={13} /> verified</span>
-          <span><Clock3 size={13} /> pending</span>
-          <span><TriangleAlert size={13} /> review</span>
-        </div>
-      ) : null}
+
+      <ChartContainer config={chartConfig} className="flex-1 min-h-0">
+        <BarChart key={inView ? 1 : 0} data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+          <CartesianGrid vertical={false} stroke="#f0f0f0" />
+          <XAxis
+            dataKey="stage"
+            tick={{ fontSize: 10, fill: "#bbbbbb" }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: "#bbbbbb" }}
+            axisLine={false}
+            tickLine={false}
+            width={32}
+          />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartLegend content={<ChartLegendContent />} />
+          {crops.map((crop, i) => (
+            <Bar
+              key={crop}
+              dataKey={crop}
+              fill={`var(--color-${crop})`}
+              radius={[3, 3, 0, 0]}
+              maxBarSize={20}
+              animationDuration={800}
+              animationEasing="ease-out"
+              animationBegin={i * 120}
+            />
+          ))}
+        </BarChart>
+      </ChartContainer>
     </section>
   );
 }
