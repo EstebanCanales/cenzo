@@ -34,12 +34,6 @@ Los agricultores pierden valor porque no tienen cómo demostrar sus prácticas. 
 
 Cada lote de café recibe un **NFT en Soroban**. Desde la siembra hasta la venta, cada etapa del ciclo queda registrada con su hash criptográfico anclado en la blockchain de Stellar. Cualquier cambio en los datos rompe el hash — la manipulación se vuelve imposible de ocultar.
 
-```
-Finca → Cosecha → Recepción → Tueste → Empaque → Calidad → Venta
-  ↓         ↓           ↓          ↓          ↓         ↓        ↓
-              SHA-256 anclado en Soroban en cada paso
-```
-
 El agricultor muestra un QR. El comprador escanea. Ve todo — verificado por la cadena.
 
 ---
