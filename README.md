@@ -74,6 +74,8 @@ El NFT del lote lleva la imagen del certificado generada dinámicamente — úni
 
 `Next.js 15` · `Rust + Axum` · `Soroban Smart Contract` · `Stellar Testnet` · `SQLite` · `NASA POWER API` · `Freighter Wallet`
 
+→ [Documentación técnica completa](docs/TECHNICAL.md)
+
 ---
 
 ---
